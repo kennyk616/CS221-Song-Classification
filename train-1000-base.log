@@ -1,0 +1,11 @@
+309 cliques found in 1000 tracks.
+min_val 9.49476492488
+max_val 397.941473258
+within clique: 3696
+  mean=83.40 +/- 0.67
+  median=75.28
+not in clique: 995304
+  mean=91.61 +/- 0.04
+  median=84.21
+Completed in 34.75 s
+
