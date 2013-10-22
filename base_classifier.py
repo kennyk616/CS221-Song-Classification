@@ -17,13 +17,11 @@ def get_all_timbre(track_paths):
 			timbre_by_segment = hdf5_getters.get_segments_timbre(h5)
 		except Exception as e:
 			print repr(e)
-			pdb.post_mortem()
+			continue
 		h5.close()
 		avg_timbre = np.mean(timbre_by_segment, axis=0)
 		dic_of_timbres[track_id] = avg_timbre
 		count +=1
-		if count > 500:
-			break
 	return dic_of_timbres
 
 def compute_distance(dic_timbres, track_id1, track_id2):
@@ -63,7 +61,9 @@ def plot_histogram(data):
 
 	print "min_val", min_val
 	print "max_val", max_val
-	print "bins", bins
+	#print "bins", bins
+	print "within clique", len(data[0])
+	print "not in clique", len(data[1])
 
 	plt.hist(data[0], bins, alpha=0.5)
 	plt.hist(data[1], bins, alpha=0.5)
