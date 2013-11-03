@@ -19,18 +19,56 @@ DATAPATH = "./MSD-SHS/train/"
 class Track:
     def __init__(self, track_id, path, clique):
         self.id = track_id
-        self.path = path
+        self.path = DATAPATH + self.path
         self.clique = clique
+        self.h5 = hdf5_getters.open_h5_file_read(path)
     
+    def get_duration(self):
+        return hdf5_getters.get_duration(h5)
+
+    def get_loudness(self):
+        return hdf5_getters.get_loudness(h5)
+
+    def get_mode(self):
+        return hdf5_getters.get_mode(h5)
+
+    def get_mode_confidence(self):
+        return hdf5_getters.get_mode_confidence(h5)
+
+    def get_segments_loudness_max(self):
+        return hdf5_getters.get_segments_loudness_max(h5)
+
+    def get_segments_loudness_max_time(self):
+        return hdf5_getters.get_segments_loudness_max_time(h5)
+
+    def get_segments_loudness_start(self):
+        return hdf5_getters.get_segments_loudness_start(h5)
+
+    def get_segments_pitches(self):
+        return hdf5_getters.get_segments_pitches(h5)
+
     def get_segments_timbre(self):
-        path = DATAPATH + self.path
-        h5 = hdf5_getters.open_h5_file_read(path)
         try:
             timbre_by_segment = hdf5_getters.get_segments_timbre(h5)
         except Exception as e:
             print repr(e)
             timbre_by_segment = None
         return timbre_by_segment
+
+    def get_tatums_start(self):
+        return hdf5_getters.get_tatums_start(h5)
+
+    def get_tatums_confidence(self):
+        return hdf5_getters.get_tatums_confidence(h5)
+
+    def get_tempo(self):
+        return hdf5_getters.get_tempo(h5)
+
+    def get_time_signature(self):
+        return hdf5_getters.get_time_signature(h5)
+
+    def get_time_signature_confidence(self):
+        return hdf5_getters.get_time_signature_confidence(h5)
 
 
 
