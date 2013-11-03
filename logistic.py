@@ -1,5 +1,8 @@
 from pylab import *
+from scipy.stats import futil
+from scipy.sparse.csgraph import _validation
 import sklearn.linear_model
+
 
 import random
 
