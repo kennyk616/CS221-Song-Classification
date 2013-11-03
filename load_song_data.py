@@ -9,6 +9,8 @@ lib_path = os.path.abspath('./lib')
 sys.path.append(lib_path)
 import hdf5_getters
 
+from utils import memoized
+
 DATAPATH = "./MSD-SHS/train/"
 
 # Load the song data as 3 different dictionaries. 
@@ -22,6 +24,7 @@ class Track:
         self.path = path
         self.clique = clique
     
+    @memoized
     def get_segments_timbre(self):
         path = DATAPATH + self.path
         h5 = hdf5_getters.open_h5_file_read(path)
@@ -30,6 +33,8 @@ class Track:
         except Exception as e:
             print repr(e)
             timbre_by_segment = None
+
+        h5.close()
         return timbre_by_segment
 
 

@@ -33,7 +33,7 @@ class CoverSongClassifier():
 
     def pair_dataset(self, songList, pairFeatureExtractor, 
                      trimRatio=1.0,
-                     rseed=None):
+                     rseed=None, verbose=False):
         """
         Generate a dataset of pairwise comparisons from a
         list of songs, using the pairFeatureExtractor(s1,s2)
@@ -98,10 +98,10 @@ class LogisticClassifier(CoverSongClassifier):
         self.trainset = (X_mat,y_list)
         self.engine.fit(X_mat, y_list)
 
-        return score(X_mat, y_list)
+        return self.engine.score(X_mat, y_list)
 
 
-    def getMetric(pairFeatureExtractor):
+    def getMetric(self, pairFeatureExtractor):
         def metric(s1,s2):
             """Returns zero for same song, 1 for different."""
             X = pairFeatureExtractor(s1,s2)
@@ -112,7 +112,7 @@ class LogisticClassifier(CoverSongClassifier):
 
         return metric
 
-    def getWeights():
+    def getWeights(self):
         """Return the internal weight vector from them logistic classifier."""
         return array(self.engine.coef_).copy()
 
