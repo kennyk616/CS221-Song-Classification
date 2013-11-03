@@ -1,5 +1,4 @@
-import sys
-import os
+import load_song_data
 from sklearn import KNeighborsClassifier
 import numpy as np
 
@@ -11,10 +10,10 @@ import hdf5_getters
 def main():
 	ntracks = int(sys.argv[1])
 
-    json_data_paths=open('./MSD-SHS/shs_dataset_train/shs_dataset_train.trackpaths.json')
-    json_data=open('./MSD-SHS/shs_dataset_train/shs_dataset_train.tracks.json')
-    track_paths = json.load(json_data_paths) #place holder for the dictionary of paths
-    track_info = json.load(json_data) #place holder for track info
+    song_data = load_song_data.Song_data()
+    track_paths = song_data.get_track_paths_train
+    track_info = song_data.get_info_train()
+    
 
 
     k = 5
