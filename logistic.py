@@ -1,9 +1,7 @@
-import os
-import sys
-import random
-
 from pylab import *
-import sklearn
+import sklearn.linear_model
+
+import random
 
 ##
 # Global parameters
@@ -33,9 +31,9 @@ class CoverSongClassifier():
         raise Exception("Not implemented yet.")
 
 
-    def pair_dataset(songList, pairFeatureExtractor, 
+    def pair_dataset(self, songList, pairFeatureExtractor, 
                      trimRatio=1.0,
-                     seed=None):
+                     rseed=None):
         """
         Generate a dataset of pairwise comparisons from a
         list of songs, using the pairFeatureExtractor(s1,s2)
@@ -68,8 +66,9 @@ class CoverSongClassifier():
         # Trim the different-clique list to a subset
         # with len(same_clique)*trimRatio pairs
         samples_diff = int(trimRatio * len(same_clique))
-        random.seed(seed)
-        diff_clique = random.sample(diff_clique, sample_diff)
+        rng = random.Random()
+        rng.seed(rseed)
+        diff_clique = rng.sample(diff_clique, samples_diff)
 
         ##
         # Extract features

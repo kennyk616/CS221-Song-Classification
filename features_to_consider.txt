@@ -1,0 +1,23 @@
+artist_name
+
+loudness: 
+
+segments_loudness_max
+segments_loudness_max_time
+segments_loudness_start
+
+segments_pitches
+
+segments_start
+
+segments_timbre
+
+similar_artsts (list of artists similar)
+
+tatum
+
+tatum_confidence
+
+tempo
+
+time_signature

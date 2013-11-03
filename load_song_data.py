@@ -22,7 +22,7 @@ class Track:
         self.path = path
         self.clique = clique
     
-    def get_segments_timbre():
+    def get_segments_timbre(self):
         path = DATAPATH + self.path
         h5 = hdf5_getters.open_h5_file_read(path)
         try:
@@ -35,7 +35,7 @@ class Track:
 
 
 class Track_dataset:
-    def __init__(self, data_set, ntracks = 0):
+    def __init__(self, data_set):
         def get_dic(path):
             json_data = open(path)
             return json.load(json_data)
@@ -43,13 +43,19 @@ class Track_dataset:
         self.track_paths = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.trackpaths.json')
         self.track_info = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.tracks.json')
         # self.track_cliques_shs = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.cliques.json')
-        if ntracks > 0: 
-            self.track_info = dict(sorted(self.track_info.items(), key=kf)[:ntracks])
-            self.track_paths = {k:v for k, v in track_paths.items() if k in tracks_info}
 
+    def prune(self, ntracks=1000):
+        """Prune the dataset down to a smaller number of tracks."""
+        kf = lambda (k,v): v['clique_name']
+        def pare_dict(d,n):
+            return dict(sorted(d.items(), key=kf)[:n])
+        self.track_info = pare_dict(self.track_info, ntracks)
+        self.track_paths = {k:v for k,v in self.track_paths.items() if k in self.track_info}
 
     def get_track(self, track_id):
         return Track(track_id, self.track_paths[track_id], self.track_info[track_id]['clique_name'])
 
+    def get_tracks(self):
+        return [self.get_track(track_id) for track_id in self.track_paths.keys()]
 
 
