@@ -79,9 +79,13 @@ def plot_histogram(data):
     max_val = max(max(l) for l in data)
     bins = np.linspace(min_val, max_val, 100)
 
-    print "min_val", min_val
-    print "max_val", max_val
-    #print "bins", bins
+    print "min_val of same", min(data[0])
+    print "max_val of same", max(data[0])
+
+    print "min_val of diff", min(data[1])
+    print "max_val of diff", max(data[1])
+
+
     print "within clique: %d" % len(data[0])
     mean0 = np.mean(data[0])
     stdmean0 = np.std(data[0]) / np.sqrt(len(data[0])-1)
