@@ -21,7 +21,7 @@ DATAPATH = "./MSD-SHS/train/"
 class Track:
     def __init__(self, track_id, path, clique):
         self.id = track_id
-        self.path = DATAPATH + self.path
+        self.path = DATAPATH + path
         self.clique = clique
         self.h5 = hdf5_getters.open_h5_file_read(path)
     

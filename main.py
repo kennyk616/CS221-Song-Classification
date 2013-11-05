@@ -3,7 +3,7 @@ import sys
 
 from pylab import *
 
-#import logistic
+import logistic
 import load_song_data
 import feature_util
 import knn
