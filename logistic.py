@@ -1,8 +1,7 @@
 from pylab import *
-from scipy.stats import futil
-from scipy.sparse.csgraph import _validation
-import sklearn.linear_model
-
+# from scipy.stats import futil
+# from scipy.sparse.csgraph import _validation
+from sklearn import linear_model, preprocessing
 
 import random
 
@@ -18,6 +17,11 @@ Y_DIFF = -1
 class CoverSongClassifier():
     def __init__(self):
         pass
+
+    def data_toarray(self, data_dict):
+        X_mat = array([x for x,y in data_dict.values()])
+        y_list = array([y for x,y in data_dict.values()])
+        return X_mat, y_list
 
     def getMetric():
         """
@@ -86,18 +90,22 @@ class CoverSongClassifier():
 
 
 class LogisticClassifier(CoverSongClassifier):
-    def __init__(self):
-        self.engine = sklearn.linear_model.LogisticRegression(penalty='l2',
-                                                              dual=False)
+    def __init__(self, reg='l2'):
+        self.engine = linear_model.LogisticRegression(penalty=reg, dual=False)
+        self.scaler = None
 
-    def fit(self, data):
-        if type(data) == dict:
-            X_mat = array([x for x,y in data.values()])
-            y_list = array([y for x,y in data.values()])
-        else: # tuple (X,y)
-            X_mat = array(data[0])
-            y_list = array(data[1])
+    def fit_scaler(self, X, **kwargs):
+        """Create a StandardScaler object to transform training and test data."""
+        self.scaler = preprocessing.StandardScaler(**kwargs)
+        self.scaler.fit(X) # compute mean and std for each feature
 
+    def scale(self, X, copy=False):
+        """In-place transform of dataset."""
+        X = self.scaler.transform(X, copy=copy)
+        return X
+
+
+    def fit(self, X_mat, y_list):
         self.trainset = (X_mat,y_list)
         self.engine.fit(X_mat, y_list)
 
