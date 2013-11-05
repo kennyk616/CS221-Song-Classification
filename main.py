@@ -25,7 +25,9 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
 
     def load_data(track_list, fit=True):
         t0 = time.time()
-        if verbose: print "Generating pairwise dataset..."
+        if verbose: 
+            print "\n===================="
+            print "Generating pairwise dataset..."
         data_dict = classifier.pair_dataset(track_list, 
                                        pairFeatureExtractor, 
                                        rseed=10,
@@ -47,7 +49,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Training logistic classifier on %d song pairs..." % len(train_data[0])
     score = classifier.fit(*train_data)    
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
-    if verbose: print "Training accuracy: %.02f%%" % (score*100.0)
+    if verbose: print "==> Training accuracy: %.02f%%" % (score*100.0)
 
     weights = classifier.getWeights()
     if verbose >= 2: print "Weights: %s" % str(weights)
@@ -59,7 +61,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Testing logistic classifier on %d song pairs..." % len(test_data[0])
     score = classifier.test(*test_data)
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
-    if verbose: print "Test accuracy: %.02f%%" % (score*100.0)
+    if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
 
     return weights, classifier.scaler
 
@@ -75,7 +77,7 @@ def test_knn(train_list, test_list, featureExtractor, weights=None, transform=No
 
     knn_classifier = knn.KNearestNeighbor(weights, data, label, k=5)
     accuracy = knn_classifier.calculate_accuracy(data, label)
-    print "KNN training accuracy: %.02f%%" % (accuracy*100.0)
+    print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
 
     test_data, test_label = feature_util.get_feature_and_labels(feature_util.combo_feature_extractor, test_list)
 
@@ -83,7 +85,7 @@ def test_knn(train_list, test_list, featureExtractor, weights=None, transform=No
     if transform != None: test_data = transform.transform(test_data)
 
     accuracy_test = knn_classifier.calculate_accuracy(test_data, test_label)
-    print "KNN test accuracy: %.02f%%" % (accuracy_test*100.0)
+    print "==> KNN test accuracy: %.02f%%" % (accuracy_test*100.0)
 
 
 def main(args):
@@ -100,8 +102,25 @@ def main(args):
     test_list = test_dataset.get_tracks()
     print "Reading test set of %d tracks -> %d loaded successfully" % (args.ntest, len(test_list))
 
-    #featureExtractor = averageTimbreFeatureExtractor
-    featureExtractor = feature_util.combo_feature_extractor
+    ##
+    # Count tracks and cliques
+    def count_cliques(track_list):
+        cliqueset = {s.clique for s in track_list}
+        print "%d cliques found in %d tracks." % (len(cliqueset), len(track_list))
+
+    print "Training set: ", 
+    count_cliques(train_list)
+    print "Test set: ", 
+    count_cliques(test_list)
+
+    ##
+    # Set up feature extractors
+    if args.features == 'timbre': 
+        print "-- using averaged timbre features --"
+        featureExtractor = feature_util.averageTimbreFeatureExtractor
+    if args.features == 'combo': 
+        print "-- using combo features --"
+        featureExtractor = feature_util.combo_feature_extractor
     pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor)
 
     weights, scaler = None, None
@@ -121,6 +140,7 @@ def main(args):
             ylabel("$|Weight_i|$")
             show()
 
+        print "==> Weight vector (feature) dimension: %d" % weights.size
       
     if args.do_knn:  
         ##
@@ -143,8 +163,14 @@ if __name__ == '__main__':
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')
     parser.add_argument('-p', '--pre', dest='preprocess', action='store_true')
-    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', default='l2',
+    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
+                        default='l2',
                         choices=['l1','l2'])
+
+    # select features
+    parser.add_argument('-f', '--features', dest='features', 
+                        default='combo',
+                        choices=['combo', 'timbre'])
 
     # Enable plotting
     parser.add_argument('--plot', dest='do_plot', action='store_true')
