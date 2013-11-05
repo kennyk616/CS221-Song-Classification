@@ -19,14 +19,9 @@ def main(ntracks=20000):
     dataset.prune(ntracks)
     track_list = dataset.get_tracks()
 
-    # Timbre features
-    def averageTimbreFeatureExtractor(track):
-        t_segments = track.get_segments_timbre()
-        return np.mean(t_segments, axis=0)
 
     #featureExtractor = averageTimbreFeatureExtractor
     #pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor)
-
     comboFeatureExtractor = feature_util.combo_feature_extractor
 
     # # Initialize classifier
@@ -49,22 +44,23 @@ def main(ntracks=20000):
     # print "Weights: %s" % str(classifier.getWeights())
 
     # weights = classifier.getWeights()
-    data, label = feature_util.get_feature_and_labels(util.combo_feature_extractor, track_list)
-    weights = [1]*len(data[0])
+    data, label = feature_util.get_feature_and_labels(feature_util.combo_feature_extractor, track_list)
+    weights = [1]*len(data[0]) # DUMMY
     knn_classifier = knn.KNearestNeighbor(weights, data, label, k=5)
     accuracy = knn_classifier(data, label)
     print "KNN accuracy on training data: ", accuracy
 
-    test_dataset = load_song_data.Truck_dataset('test')
+    test_dataset = load_song_data.Track_dataset('test')
     test.dataset.prune(1000)
     test_track_list = test_dataset.get_tracks()
-    test_data, test_label = feature_util.get_feature_and_labels(util.combo_feature_extractor, test_track_list)
+    test_data, test_label = feature_util.get_feature_and_labels(feature_util.combo_feature_extractor, test_track_list)
     accuracy_test = knn_classifier(test_data, test_label)
     print "KNN accuracy on testing data: ", accuracy_test
 
 
 
 if __name__ == '__main__':
+
     try:
         main(1000)
     except Exception as e:
