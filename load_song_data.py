@@ -11,7 +11,7 @@ import hdf5_getters
 
 from utils import memoized
 
-DATAPATH = "./MSD-SHS/train/"
+DATAPATH_ROOT = "./MSD-SHS/"
 
 # Load the song data as 3 different dictionaries. 
 # track path gives a (key, value) as (<work>, <path>)
@@ -19,11 +19,11 @@ DATAPATH = "./MSD-SHS/train/"
 # are TID, AID, work, and clique_name
 
 class Track:
-    def __init__(self, track_id, path, clique):
+    def __init__(self, track_id, path, clique, DATAPATH='.'):
         self.id = track_id
-        self.path = DATAPATH + path
+        self.path = os.path.join(DATAPATH, path)
         self.clique = clique
-        self.h5 = hdf5_getters.open_h5_file_read(path)
+        self.h5 = hdf5_getters.open_h5_file_read(self.path)
     
     def close(self):
         self.h5.close()
@@ -116,8 +116,9 @@ class Track_dataset:
             json_data = open(path)
             return json.load(json_data)
 
-        self.track_paths = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.trackpaths.json')
-        self.track_info = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.tracks.json')
+        self.data_set = data_set # test, train, full
+        self.track_paths = get_dic(DATAPATH_ROOT + 'shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.trackpaths.json')
+        self.track_info = get_dic(DATAPATH_ROOT + 'shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.tracks.json')
         # self.track_cliques_shs = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.cliques.json')
 
     def prune(self, ntracks=1000):
@@ -129,7 +130,9 @@ class Track_dataset:
         self.track_paths = {k:v for k,v in self.track_paths.items() if k in self.track_info}
 
     def get_track(self, track_id):
-        return Track(track_id, self.track_paths[track_id], self.track_info[track_id]['clique_name'])
+        return Track(track_id, self.track_paths[track_id], 
+                     self.track_info[track_id]['clique_name'],
+                     DATAPATH=os.path.join(DATAPATH_ROOT, self.data_set))
 
     def get_tracks(self):
         return [self.get_track(track_id) for track_id in self.track_paths.keys()]
