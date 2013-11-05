@@ -143,7 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')
     parser.add_argument('-p', '--pre', dest='preprocess', action='store_true')
-    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', default='l1',
+    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', default='l2',
                         choices=['l1','l2'])
 
     # Enable plotting
