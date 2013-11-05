@@ -23,9 +23,15 @@ class Track:
         self.id = track_id
         self.path = os.path.join(DATAPATH, path)
         self.clique = clique
-        self.h5 = hdf5_getters.open_h5_file_read(self.path)
+        try:
+            self.h5 = hdf5_getters.open_h5_file_read(self.path)
+            self.h5.close()
+            self.h5 = None
+        except Exception as e:
+            self.h5 = -1
     
     def close(self):
+        if self.h5 == None: return # do nothing
         self.h5.close()
         self.h5 = None
 
@@ -135,6 +141,14 @@ class Track_dataset:
                      DATAPATH=os.path.join(DATAPATH_ROOT, self.data_set))
 
     def get_tracks(self):
-        return [self.get_track(track_id) for track_id in self.track_paths.keys()]
+        tracks = []
+        for track_id in self.track_paths.keys():
+            newtrack = self.get_track(track_id)
+            if newtrack.h5 == -1: 
+                print "Error: unable to open track %s" % track_id
+                continue
+            tracks.append(newtrack)
+
+        return tracks
 
 
