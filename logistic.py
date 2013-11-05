@@ -111,6 +111,8 @@ class LogisticClassifier(CoverSongClassifier):
 
         return self.engine.score(X_mat, y_list)
 
+    def test(self, X_mat, y_list):
+        return self.engine.score(X_mat, y_list)
 
     def getMetric(self, pairFeatureExtractor):
         def metric(s1,s2):
