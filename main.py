@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     # Run preprocessing (scaler)?
     parser.add_argument('-p', '--pre', dest='preprocess', action='store_true')
-    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', default='l1',
+    parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', default='l2',
                         choices=['l1','l2'])
 
     args = parser.parse_args()
