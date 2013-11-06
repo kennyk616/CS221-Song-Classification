@@ -66,7 +66,9 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     return weights, classifier.scaler
 
 
-def test_knn(train_list, test_list, featureExtractor, weights=None, transform=None):
+def test_knn(train_list, test_list, featureExtractor, 
+             k = 5,
+             weights=None, transform=None):
     if weights == None:
         weights = ones(len(data[0])) # DUMMY
 
@@ -75,7 +77,7 @@ def test_knn(train_list, test_list, featureExtractor, weights=None, transform=No
     # Transform data (preprocessor)
     if transform != None: data = transform.transform(data)
 
-    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=5)
+    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k)
     accuracy = knn_classifier.calculate_accuracy(data, label)
     print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
 
@@ -140,6 +142,7 @@ def main(args):
             ylabel("$|Weight_i|$")
             show()
 
+        print ""
         print "==> Weight vector (feature) dimension: %d" % weights.size
       
     if args.do_knn:  
@@ -150,7 +153,7 @@ def main(args):
         #
         test_knn(train_list, test_list, featureExtractor, 
                  weights=weights, 
-                 transform=scaler)
+                 transform=scaler, k=args.k)
 
 
 if __name__ == '__main__':
@@ -163,9 +166,14 @@ if __name__ == '__main__':
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')
     parser.add_argument('-p', '--pre', dest='preprocess', action='store_true')
+
+    # Options for logistic classifier
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
                         default='l2',
                         choices=['l1','l2'])
+
+    # Options for KNN classifier
+    parser.add_argument('-k', dest='k', default=5, type=int)
 
     # select features
     parser.add_argument('-f', '--features', dest='features', 
