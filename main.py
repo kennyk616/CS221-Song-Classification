@@ -69,10 +69,11 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
 def test_knn(train_list, test_list, featureExtractor, 
              k = 5,
              weights=None, transform=None):
-    if weights == None:
-        weights = ones(len(data[0])) # DUMMY
 
     data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
+
+    if weights == None:
+        weights = ones(len(data[0])) # DUMMY
 
     # Transform data (preprocessor)
     if transform != None: data = transform.transform(data)
@@ -81,7 +82,7 @@ def test_knn(train_list, test_list, featureExtractor,
     accuracy = knn_classifier.calculate_accuracy(data, label)
     print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
 
-    test_data, test_label = feature_util.get_feature_and_labels(feature_util.combo_feature_extractor, test_list)
+    test_data, test_label = feature_util.get_feature_and_labels(featureExtractor, test_list)
 
     # Transform data (preprocessor)
     if transform != None: test_data = transform.transform(test_data)
@@ -123,7 +124,9 @@ def main(args):
     if args.features == 'combo': 
         print "-- using combo features --"
         featureExtractor = feature_util.combo_feature_extractor
-    pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor)
+    pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor, 
+                                                                             # take_abs=False)
+                                                                             take_abs=True)
 
     weights, scaler = None, None
     if args.do_logistic:
@@ -137,6 +140,7 @@ def main(args):
         if args.do_plot:
             figure(1).clear()
             bar(range(weights.size), abs(weights.flatten()), width=0.9, align='center')
+            # bar(range(weights.size), weights.flatten(), width=0.9, align='center')
             xlim(0,weights.size)
             xlabel("Index ($i$)")
             ylabel("$|Weight_i|$")

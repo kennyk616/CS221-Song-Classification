@@ -4,12 +4,13 @@ from pylab import *
 # Helper functions for processing data and extracting features
 #
 
-def make_subtractivePairFeatureExtractor(featureExtractor):
+def make_subtractivePairFeatureExtractor(featureExtractor, take_abs=False):
 
     def pairFeatureExtractor(s1,s2):
         f1 = featureExtractor(s1)
         f2 = featureExtractor(s2)
-        return (f1 - f2)
+        if take_abs: return np.abs(f1-f2)
+        else: return (f1 - f2)
 
     return pairFeatureExtractor
 
