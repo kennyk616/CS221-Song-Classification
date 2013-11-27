@@ -117,14 +117,16 @@ class Track:
 
 
 class Track_dataset:
-    def __init__(self, data_set):
+    def __init__(self):
         def get_dic(path):
             json_data = open(path)
             return json.load(json_data)
 
-        self.data_set = data_set # test, train, full
-        self.track_paths = get_dic(DATAPATH_ROOT + 'shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.trackpaths.json')
-        self.track_info = get_dic(DATAPATH_ROOT + 'shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.tracks.json')
+        #self.data_set = data_set # test, train, full
+        self.track_paths_train = get_dic(DATAPATH_ROOT + 'shs_dataset_train/shs_dataset_train.trackpaths.json')
+        self.track_paths_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.trackpaths.json')
+        self.track_info_train = get_dic(DATAPATH_ROOT + 'shs_dataset_train/shs_dataset_train.tracks.json')
+        self.track_info_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.tracks.json')
         # self.track_cliques_shs = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.cliques.json')
 
     def prune(self, ntracks=1000):
@@ -132,17 +134,47 @@ class Track_dataset:
         kf = lambda (k,v): v['clique_name']
         def pare_dict(d,n):
             return dict(sorted(d.items(), key=kf)[:n])
-        self.track_info = pare_dict(self.track_info, ntracks)
-        self.track_paths = {k:v for k,v in self.track_paths.items() if k in self.track_info}
+        self.track_info_train = pare_dict(self.track_info_train, ntracks)
+        self.track_paths_train = {k:v for k,v in self.track_paths_train.items() if k in self.track_info_train}
+
+        all_cliques = set()
+        for k, v in self.track_info_train.iteritems():
+            all_cliques.add(v['clique_name'])
+        print "# clicks = ", len(all_cliques)
+
+        tmp_dic = dict()
+        for track_id, values in self.track_info_test.iteritems():
+            if values['clique_name'] in all_cliques:
+                tmp_dic[track_id] = values
+        self.track_info_test = tmp_dic
+        self.track_paths_test = {k:v for k,v in self.track_paths_test.items() if k in self.track_info_test}
+
 
     def get_track(self, track_id):
-        return Track(track_id, self.track_paths[track_id], 
-                     self.track_info[track_id]['clique_name'],
-                     DATAPATH=os.path.join(DATAPATH_ROOT, self.data_set))
+        if track_id in self.track_info_train:
+            clique_name = self.track_info_train[track_id]['clique_name']
+            track_path = self.track_paths_train[track_id]
+            path = 'train'
+        else:
+            clique_name = self.track_info_test[track_id]['clique_name']
+            track_path = self.track_paths_test[track_id]
+            path = 'test'
+        return Track(track_id, track_path, clique_name, DATAPATH=os.path.join(DATAPATH_ROOT, path))
 
-    def get_tracks(self):
+    def get_tracks_train(self):
+        return self.get_tracks('train')
+
+    def get_tracks_test(self):
+        return self.get_tracks('test')
+
+    def get_tracks(self, path):
         tracks = []
-        for track_id in self.track_paths.keys():
+        if path =='train':
+            paths = self.track_paths_train
+        else:
+            paths = self.track_paths_test
+
+        for track_id in paths:
             newtrack = self.get_track(track_id)
             if newtrack.h5 == -1: 
                 print "Error: unable to open track %s" % track_id
@@ -150,5 +182,3 @@ class Track_dataset:
             tracks.append(newtrack)
 
         return tracks
-
-

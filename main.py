@@ -93,24 +93,17 @@ def test_knn(train_list, test_list, featureExtractor,
 
 def main(args):
 
-    # Load Training list
-    dataset = load_song_data.Track_dataset('train')
+    # Load Training List
+    dataset = load_song_data.Track_dataset()
     dataset.prune(args.ntrain)
-    train_list = dataset.get_tracks()
-    print "Reading train set of %d tracks -> %d loaded successfully" % (args.ntrain, len(train_list))
-
-    # Load Test list
-    test_dataset = load_song_data.Track_dataset('test')
-    test_dataset.prune(args.ntest)
-    test_list = test_dataset.get_tracks()
-    print "Reading test set of %d tracks -> %d loaded successfully" % (args.ntest, len(test_list))
+    train_list = dataset.get_tracks_train()
+    test_list = dataset.get_tracks_test()
 
     ##
     # Count tracks and cliques
     def count_cliques(track_list):
         cliqueset = {s.clique for s in track_list}
         print "%d cliques found in %d tracks." % (len(cliqueset), len(track_list))
-
     print "Training set: ", 
     count_cliques(train_list)
     print "Test set: ", 
