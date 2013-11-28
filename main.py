@@ -95,7 +95,7 @@ def main(args):
 
     # Load Training List
     dataset = load_song_data.Track_dataset()
-    dataset.prune(args.ntrain)
+    dataset.prune(args.nclique)
     train_list = dataset.get_tracks_train()
     test_list = dataset.get_tracks_test()
 
@@ -157,8 +157,9 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Cover Song Identifier")
 
-    parser.add_argument('-t', '--ntrain', dest='ntrain', type=int, default=5000)
-    parser.add_argument('-e', '--ntest', dest='ntest', type=int, default=1000)
+    #parser.add_argument('-t', '--ntrain', dest='ntrain', type=int, default=5000)
+    #parser.add_argument('-e', '--ntest', dest='ntest', type=int, default=1000)
+    parser.add_argument('-c', '--nclique', dest='nclique', type=int, default=300)
 
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')

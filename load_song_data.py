@@ -5,6 +5,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+from collections import Counter
+
 lib_path = os.path.abspath('./lib')
 sys.path.append(lib_path)
 import hdf5_getters
@@ -122,63 +124,86 @@ class Track_dataset:
             json_data = open(path)
             return json.load(json_data)
 
-        #self.data_set = data_set # test, train, full
-        self.track_paths_train = get_dic(DATAPATH_ROOT + 'shs_dataset_train/shs_dataset_train.trackpaths.json')
-        self.track_paths_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.trackpaths.json')
-        self.track_info_train = get_dic(DATAPATH_ROOT + 'shs_dataset_train/shs_dataset_train.tracks.json')
-        self.track_info_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.tracks.json')
-        # self.track_cliques_shs = get_dic('./MSD-SHS/shs_dataset_' + data_set + '/shs_dataset_' + data_set + '.cliques.json')
+        self.track_paths_full = get_dic(DATAPATH_ROOT + 'shs_dataset_full/shs_dataset_full.trackpaths.json')
+        self.track_info_full = get_dic(DATAPATH_ROOT + 'shs_dataset_full/shs_dataset_full.tracks.json')
+        self.track_paths_train = dict()
+        self.track_info_train = dict()
+        self.track_paths_test = dict()
+        self.track_info_test = dict()
 
-    def prune(self, ntracks=1000):
+        self.track_paths_loc_train = get_dic(DATAPATH_ROOT + 'shs_dataset_train/shs_dataset_train.trackpaths.json')
+        self.track_paths_loc_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.trackpaths.json')
+
+
+    def prune(self, ncliques=300):
         """Prune the dataset down to a smaller number of tracks."""
-        kf = lambda (k,v): v['clique_name']
-        def pare_dict(d,n):
-            return dict(sorted(d.items(), key=kf)[:n])
-        self.track_info_train = pare_dict(self.track_info_train, ntracks)
-        self.track_paths_train = {k:v for k,v in self.track_paths_train.items() if k in self.track_info_train}
 
-        all_cliques = set()
-        for k, v in self.track_info_train.iteritems():
-            all_cliques.add(v['clique_name'])
-        print "# clicks = ", len(all_cliques)
+        # get the count for cliques, and sort by size of the clique
+        clique_counter = Counter()
+        for k, v in self.track_info_full.iteritems():
+            clique_counter[v['clique_name']] += 1
+        sorted_clique_counter = dict(sorted(clique_counter.items(), key= lambda item: item[1], reverse=True)[:ncliques])
+        #print sorted_clique_counter
 
+        #trim down self.track_info_full
+        # get a dictionary of {clique_name : list of track_ids}
         tmp_dic = dict()
-        for track_id, values in self.track_info_test.iteritems():
-            if values['clique_name'] in all_cliques:
+        clique_dic = dict()
+        for track_id, values in self.track_info_full.iteritems():
+            if values['clique_name'] in sorted_clique_counter:
                 tmp_dic[track_id] = values
-        self.track_info_test = tmp_dic
-        self.track_paths_test = {k:v for k,v in self.track_paths_test.items() if k in self.track_info_test}
+                if values['clique_name'] in clique_dic:
+                    clique_dic[values['clique_name']].append(track_id)
+                else:
+                    clique_dic[values['clique_name']] = [track_id]
+                    
+        self.track_info_full = tmp_dic
+
+        # split up training and testing sets. 1/3 for testing (round down), and 2/3 for training (round up)
+        for clique, tracks in clique_dic.iteritems():
+            n_test = len(tracks)/3
+            for i in xrange(len(tracks)):
+                if i < n_test:
+                    self.track_info_test[tracks[i]] = self.track_info_full[tracks[i]]
+                else:
+                    self.track_info_train[tracks[i]] = self.track_info_full[tracks[i]]
+
+        # populate self.track_paths
+        self.track_paths_train = {k:v for k,v in self.track_paths_full.items() if k in self.track_info_train}
+        self.track_paths_test = {k:v for k,v in self.track_paths_full.items() if k in self.track_info_test}
 
 
     def get_track(self, track_id):
+        def path_loc(track_id):
+            if track_id in self.track_paths_loc_train:
+                return 'train'
+            elif track_id in self.track_paths_loc_test:
+                return 'test'
+            else:
+                # should never go to this line
+                print "Error: not in train or test!"
+                return None
         if track_id in self.track_info_train:
             clique_name = self.track_info_train[track_id]['clique_name']
             track_path = self.track_paths_train[track_id]
-            path = 'train'
         else:
             clique_name = self.track_info_test[track_id]['clique_name']
             track_path = self.track_paths_test[track_id]
-            path = 'test'
-        return Track(track_id, track_path, clique_name, DATAPATH=os.path.join(DATAPATH_ROOT, path))
+        return Track(track_id, track_path, clique_name, DATAPATH=os.path.join(DATAPATH_ROOT, path_loc(track_id)))
 
     def get_tracks_train(self):
-        return self.get_tracks('train')
+        return self.get_tracks(self.track_paths_train)
 
     def get_tracks_test(self):
-        return self.get_tracks('test')
+        return self.get_tracks(self.track_paths_test)
 
-    def get_tracks(self, path):
+    def get_tracks(self, paths):
         tracks = []
-        if path =='train':
-            paths = self.track_paths_train
-        else:
-            paths = self.track_paths_test
-
         for track_id in paths:
-            newtrack = self.get_track(track_id)
-            if newtrack.h5 == -1: 
+            new_track = self.get_track(track_id)
+            if new_track.h5 == -1: 
                 print "Error: unable to open track %s" % track_id
                 continue
-            tracks.append(newtrack)
+            tracks.append(new_track)
 
         return tracks
