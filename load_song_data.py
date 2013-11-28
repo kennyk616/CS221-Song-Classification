@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import Counter
+import random
 
 lib_path = os.path.abspath('./lib')
 sys.path.append(lib_path)
@@ -162,6 +163,7 @@ class Track_dataset:
         # split up training and testing sets. 1/3 for testing (round down), and 2/3 for training (round up)
         for clique, tracks in clique_dic.iteritems():
             n_test = len(tracks)/3
+            random.shuffle(tracks)
             for i in xrange(len(tracks)):
                 if i < n_test:
                     self.track_info_test[tracks[i]] = self.track_info_full[tracks[i]]
