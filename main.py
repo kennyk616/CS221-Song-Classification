@@ -2,8 +2,8 @@ import os
 import sys
 
 # For matplotlib png output
-# import matplotlib
-# matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 
 from pylab import *
 
@@ -17,11 +17,13 @@ import pdb
 
 
 def run_logistic(train_list, test_list, pairFeatureExtractor, 
+                 rseed=10,
                  verbose=False, 
                  do_scale=True,
-                 reg='l2'):
+                 reg='l2',
+                 rstrength=1.0):
     # Initialize classifier
-    classifier = logistic.LogisticClassifier(reg=reg)
+    classifier = logistic.LogisticClassifier(reg=reg, rstrength=rstrength)
 
     def load_data(track_list, fit=True):
         t0 = time.time()
@@ -30,7 +32,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
             print "Generating pairwise dataset..."
         data_dict = classifier.pair_dataset(track_list, 
                                        pairFeatureExtractor, 
-                                       rseed=10,
+                                       rseed=rseed,
                                        verbose=True)
         data = classifier.data_toarray(data_dict)
         if verbose: print "Completed in %.02f s" % (time.time() - t0)
@@ -95,7 +97,7 @@ def main(args):
 
     # Load Training List
     dataset = load_song_data.Track_dataset()
-    dataset.prune(args.nclique)
+    dataset.prune(args.nclique, rseed=args.rseed_xval)
     train_list = dataset.get_tracks_train()
     test_list = dataset.get_tracks_test()
 
@@ -124,7 +126,10 @@ def main(args):
     weights, scaler = None, None
     if args.do_logistic:
         weights, scaler = run_logistic(train_list, test_list,
-                                       pairFeatureExtractor, 
+                                       pairFeatureExtractor,
+                                       reg=args.reg,
+                                       rseed=args.rseed_pairs,
+                                       rstrength=args.rstrength,
                                        verbose=1,
                                        do_scale=args.preprocess)
         ##
@@ -138,6 +143,9 @@ def main(args):
             xlabel("Index ($i$)")
             ylabel("$|Weight_i|$")
             show()
+
+            sfname = "_".join(sys.argv)
+            savefig(os.path.join(args.outdir,sfname)+".png")
 
         print ""
         print "==> Weight vector (feature) dimension: %d" % weights.size
@@ -169,9 +177,20 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
                         default='l2',
                         choices=['l1','l2'])
+    # Regularization strength: higher is stronger
+    parser.add_argument('--rstrength', dest='rstrength', default=1.0, type=float)
 
     # Options for KNN classifier
     parser.add_argument('-k', dest='k', default=5, type=int)
+
+    # Random seeds
+    # for cross-validation (train|test partition)
+    # and pair selection (logistic classifier)
+    parser.add_argument('--seed_xval', dest='rseed_xval', type=int, default=10)
+    parser.add_argument('--seed_pairs', dest='rseed_pairs', type=int, default=10)
+
+    # Test fracton
+    parser.add_argument("--test_fraction", dest='test_fraction', type=float, default=0.33)
 
     # select features
     parser.add_argument('-f', '--features', dest='features', 
@@ -180,12 +199,15 @@ if __name__ == '__main__':
 
     # Enable plotting
     parser.add_argument('--plot', dest='do_plot', action='store_true')
-
+    parser.add_argument('--outdir', dest='outdir', default="output")
 
     args = parser.parse_args()
     if not args.do_logistic and not args.do_knn:
         args.do_knn = True
         args.do_logistic = True
+
+    # Make output directory
+    if not os.path.isdir(args.outdir): os.mkdir(args.outdir)
 
     try:
         main(args)

@@ -90,8 +90,10 @@ class CoverSongClassifier():
 
 
 class LogisticClassifier(CoverSongClassifier):
-    def __init__(self, reg='l2'):
-        self.engine = linear_model.LogisticRegression(penalty=reg, dual=False)
+    def __init__(self, reg='l2', rstrength=1.0):
+        self.engine = linear_model.LogisticRegression(penalty=reg,
+                                                      C = 1.0/rstrength,
+                                                      dual=False)
         self.scaler = None
 
     def fit_scaler(self, X, **kwargs):

@@ -136,7 +136,7 @@ class Track_dataset:
         self.track_paths_loc_test = get_dic(DATAPATH_ROOT + 'shs_dataset_test/shs_dataset_test.trackpaths.json')
 
 
-    def prune(self, ncliques=300):
+    def prune(self, ncliques=300, rseed=None, test_fraction=0.33):
         """Prune the dataset down to a smaller number of tracks."""
 
         # get the count for cliques, and sort by size of the clique
@@ -160,10 +160,13 @@ class Track_dataset:
                     
         self.track_info_full = tmp_dic
 
-        # split up training and testing sets. 1/3 for testing (round down), and 2/3 for training (round up)
+        # split up training and testing sets. ~1/3 for testing (round down), and 2/3 for training (round up)
+        rng = random.Random()
+        rng.seed(rseed)
         for clique, tracks in clique_dic.iteritems():
-            n_test = len(tracks)/3
-            random.shuffle(tracks)
+            n_test = int(len(tracks)*test_fraction)
+            # random.shuffle(tracks)
+            rng.shuffle(tracks)
             for i in xrange(len(tracks)):
                 if i < n_test:
                     self.track_info_test[tracks[i]] = self.track_info_full[tracks[i]]
