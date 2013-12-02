@@ -8,6 +8,7 @@ matplotlib.use('Agg')
 from pylab import *
 
 import logistic
+import transform
 import load_song_data
 import feature_util
 import knn
@@ -19,11 +20,18 @@ import pdb
 def run_logistic(train_list, test_list, pairFeatureExtractor, 
                  rseed=10,
                  verbose=False, 
-                 do_scale=True,
+                 pre_mode='none',
                  reg='l2',
                  rstrength=1.0):
     # Initialize classifier
-    classifier = logistic.LogisticClassifier(reg=reg, rstrength=rstrength)
+    if pre_mode == 'scale': xform = transform.StandardScaler()
+    elif pre_mode == 'whiten': xform = transform.PCAWhitener()
+    elif pre_mode == 'both': xform = transform.ScaleThenWhiten()
+    else: xform = transform.IdentityTransformer()
+
+    classifier = logistic.LogisticClassifier(reg=reg, 
+                                             rstrength=rstrength,
+                                             dataTransformer=xform)
 
     def load_data(track_list, fit=True):
         t0 = time.time()
@@ -34,13 +42,12 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
                                        pairFeatureExtractor, 
                                        rseed=rseed,
                                        verbose=True)
-        data = classifier.data_toarray(data_dict)
+        data = classifier.transformer.data_toarray(data_dict)
         if verbose: print "Completed in %.02f s" % (time.time() - t0)
 
-        if do_scale:
-            print "Preprocessing data with scaler..."
-            if fit: classifier.fit_scaler(data[0]) # calculate preprocessor parameters
-            data = (classifier.scale(data[0]), data[1]) # preprocess
+        print "Preprocessing data with %s..." % str(type(xform))
+        if fit: classifier.transformer.fit(data[0]) # calculate preprocessor parameters
+        data = (classifier.transformer.transform(data[0]), data[1]) # preprocess
 
         return data
 
@@ -65,7 +72,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
 
-    return weights, classifier.scaler
+    return weights, classifier.transformer
 
 
 def test_knn(train_list, test_list, featureExtractor, 
@@ -123,15 +130,15 @@ def main(args):
                                                                              # take_abs=False)
                                                                              take_abs=True)
 
-    weights, scaler = None, None
+    weights, xform = None, None
     if args.do_logistic:
-        weights, scaler = run_logistic(train_list, test_list,
+        weights, xform = run_logistic(train_list, test_list,
                                        pairFeatureExtractor,
                                        reg=args.reg,
                                        rseed=args.rseed_pairs,
                                        rstrength=args.rstrength,
                                        verbose=1,
-                                       do_scale=args.preprocess)
+                                       pre_mode=args.preprocess)
         ##
         # Plot weight vector
         #
@@ -158,7 +165,7 @@ def main(args):
         #
         test_knn(train_list, test_list, featureExtractor, 
                  weights=weights, 
-                 transform=scaler, k=args.k)
+                 transform=xform, k=args.k)
 
 
 if __name__ == '__main__':
@@ -171,7 +178,11 @@ if __name__ == '__main__':
 
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')
-    parser.add_argument('-p', '--pre', dest='preprocess', action='store_true')
+
+    # Preprocessing mode    
+    parser.add_argument('-p', '--pre', dest='preprocess', 
+                        default='none',
+                        choices=['none', 'scale', 'whiten', 'both'])
 
     # Options for logistic classifier
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 

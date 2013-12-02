@@ -5,6 +5,9 @@ from sklearn import linear_model, preprocessing
 
 import random
 
+# Data transformer classes
+import transform
+
 ##
 # Global parameters
 #
@@ -14,14 +17,9 @@ Y_DIFF = -1
 ##
 # Template class
 #
-class CoverSongClassifier():
-    def __init__(self):
-        pass
-
-    def data_toarray(self, data_dict):
-        X_mat = array([x for x,y in data_dict.values()])
-        y_list = array([y for x,y in data_dict.values()])
-        return X_mat, y_list
+class PairwiseSongClassifier(object):
+    def __init__(self, dataTransformer):
+        self.transformer = dataTransformer
 
     def getMetric():
         """
@@ -89,23 +87,12 @@ class CoverSongClassifier():
         return outdict
 
 
-class LogisticClassifier(CoverSongClassifier):
-    def __init__(self, reg='l2', rstrength=1.0):
+class LogisticClassifier(PairwiseSongClassifier):
+    def __init__(self, reg='l2', rstrength=1.0, dataTransformer=transform.IdentityTransformer):
+        super(LogisticClassifier, self).__init__(dataTransformer)
         self.engine = linear_model.LogisticRegression(penalty=reg,
                                                       C = 1.0/rstrength,
                                                       dual=False)
-        self.scaler = None
-
-    def fit_scaler(self, X, **kwargs):
-        """Create a StandardScaler object to transform training and test data."""
-        self.scaler = preprocessing.StandardScaler(**kwargs)
-        self.scaler.fit(X) # compute mean and std for each feature
-
-    def scale(self, X, copy=False):
-        """In-place transform of dataset."""
-        X = self.scaler.transform(X, copy=copy)
-        return X
-
 
     def fit(self, X_mat, y_list):
         self.trainset = (X_mat,y_list)
