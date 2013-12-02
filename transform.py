@@ -58,7 +58,8 @@ class PCAWhitener(IdentityTransformer):
 class ScaleThenWhiten(IdentityTransformer):
     def __init__(self, copy=True, n_components=None):
         self.scaler = StandardScaler()
-        self.whitener = PCAWhitener(copy=True)
+        self.whitener = PCAWhitener(n_components=n_components,
+                                    copy=True)
 
     def fit(self, X):
         self.whitener.fit(X)

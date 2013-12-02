@@ -117,6 +117,20 @@ class Track:
         if self.h5 == None: self.open()
         return hdf5_getters.get_time_signature_confidence(self.h5)
 
+    @memoized
+    def get_key(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_key(self.h5)
+
+    @memoized
+    def get_danceability(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_danceability(self.h5)
+
+    @memoized
+    def get_energy(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_energy(self.h5)
 
 
 class Track_dataset:

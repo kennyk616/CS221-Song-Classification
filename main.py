@@ -21,13 +21,18 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
                  rseed=10,
                  verbose=False, 
                  pre_mode='none',
+                 npca=None,
                  reg='l2',
                  rstrength=1.0):
     # Initialize classifier
     if pre_mode == 'scale': xform = transform.StandardScaler()
     elif pre_mode == 'whiten': xform = transform.PCAWhitener()
     elif pre_mode == 'both': xform = transform.ScaleThenWhiten()
+    elif pre_mode == 'pca': 
+        print "PCA: using %d components" % npca
+        xform = transform.PCAWhitener(n_components=npca)
     else: xform = transform.IdentityTransformer()
+    print "Data preprocessor: %s" % str(type(xform))
 
     classifier = logistic.LogisticClassifier(reg=reg, 
                                              rstrength=rstrength,
@@ -45,7 +50,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
         data = classifier.transformer.data_toarray(data_dict)
         if verbose: print "Completed in %.02f s" % (time.time() - t0)
 
-        print "Preprocessing data with %s..." % str(type(xform))
+        print "Preprocessing data..."
         if fit: classifier.transformer.fit(data[0]) # calculate preprocessor parameters
         data = (classifier.transformer.transform(data[0]), data[1]) # preprocess
 
@@ -126,6 +131,10 @@ def main(args):
     if args.features == 'combo': 
         print "-- using combo features --"
         featureExtractor = feature_util.combo_feature_extractor
+    if args.features == 'combo2': 
+        print "-- using combo2 features --"
+        featureExtractor = feature_util.combo2_feature_extractor
+
     pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor, 
                                                                              # take_abs=False)
                                                                              take_abs=True)
@@ -138,7 +147,8 @@ def main(args):
                                        rseed=args.rseed_pairs,
                                        rstrength=args.rstrength,
                                        verbose=1,
-                                       pre_mode=args.preprocess)
+                                       pre_mode=args.preprocess,
+                                       npca=args.npca)
         ##
         # Plot weight vector
         #
@@ -179,10 +189,13 @@ if __name__ == '__main__':
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('--knn', dest='do_knn', action='store_true')
 
-    # Preprocessing mode    
+    ##
+    # Preprocessing mode and parameters
     parser.add_argument('-p', '--pre', dest='preprocess', 
                         default='none',
-                        choices=['none', 'scale', 'whiten', 'both'])
+                        choices=['none', 'scale', 'whiten', 'both', 'pca'])
+    parser.add_argument('--pca', dest='npca', type=int,
+                        default=100)
 
     # Options for logistic classifier
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
@@ -206,7 +219,7 @@ if __name__ == '__main__':
     # select features
     parser.add_argument('-f', '--features', dest='features', 
                         default='combo',
-                        choices=['combo', 'timbre'])
+                        choices=['timbre', 'combo', 'combo2'])
 
     # Enable plotting
     parser.add_argument('--plot', dest='do_plot', action='store_true')

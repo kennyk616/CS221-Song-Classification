@@ -23,22 +23,54 @@ def sample_segments_feature(feature, n=10):
     # return sample_features[0:n]
     return out
 
+def sample_vector_feature(feature, n=10):
+    feature = feature.reshape((len(feature),1))
+    return sample_segments_feature(feature, n=n)
+
 # features used: loudness, duration, loudness_max, 
 # segments_pitches, segments_timbre, tempo
-def combo_feature_extractor(track):
+def combo_feature_extractor(track, ns=10):
+
+    # One-dimensional features
     loudness = track.get_loudness()
     duration = track.get_duration()
-    sample_segment_pitches = sample_segments_feature(track.get_segments_pitches()).flatten()
-    sample_segment_timbre = sample_segments_feature(track.get_segments_timbre()).flatten()
     tempo = track.get_tempo()
+
+    # Sampled vector features
+    sample_segment_pitches = sample_segments_feature(track.get_segments_pitches(), n=ns).flatten()
+    sample_segment_timbre = sample_segments_feature(track.get_segments_timbre(), n=ns).flatten()
 
     track.close() # filesystem garbage collection
 
     # one big frickin vector
-    return concatenate(([loudness],[duration],
+    return concatenate(([loudness],[duration],[tempo],
                      sample_segment_pitches,
-                     sample_segment_timbre,
-                     [tempo]))
+                     sample_segment_timbre))
+
+# like combo features, but super-sized!
+def combo2_feature_extractor(track, ns=10):
+    # One-dimensional objective features
+    loudness = track.get_loudness()
+    duration = track.get_duration()
+    tempo = track.get_tempo()
+    key = track.get_key()
+    mode = track.get_mode()
+    danceability = track.get_danceability()
+    energy = track.get_energy()
+
+    # Sampled vector features
+    sample_segment_pitches = sample_segments_feature(track.get_segments_pitches(), n=ns).flatten()
+    sample_segment_timbre = sample_segments_feature(track.get_segments_timbre(), n=ns).flatten()
+    sample_segment_loudness_max = sample_vector_feature(track.get_segments_loudness_max(), n=ns).flatten()
+
+    track.close() # filesystem garbage collection
+
+    # one big frickin vector
+    return concatenate(([loudness],[duration],[tempo],
+                       [key],[mode],[danceability],[energy],
+                       sample_segment_pitches,
+                       sample_segment_timbre,
+                       sample_segment_loudness_max))
 
 
 def averageTimbreFeatureExtractor(track):
