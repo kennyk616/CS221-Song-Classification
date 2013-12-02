@@ -29,7 +29,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     elif pre_mode == 'whiten': xform = transform.PCAWhitener()
     elif pre_mode == 'both': xform = transform.ScaleThenWhiten()
     elif pre_mode == 'pca': 
-        print "PCA: using %d components" % npca
+        print "PCA: using %g components" % npca
         xform = transform.PCAWhitener(n_components=npca)
     else: xform = transform.IdentityTransformer()
     print "Data preprocessor: %s" % str(type(xform))
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--pre', dest='preprocess', 
                         default='none',
                         choices=['none', 'scale', 'whiten', 'both', 'pca'])
-    parser.add_argument('--pca', dest='npca', type=int,
+    parser.add_argument('--pca', dest='npca', type=float,
                         default=100)
 
     # Options for logistic classifier

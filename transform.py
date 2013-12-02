@@ -41,6 +41,7 @@ class StandardScaler(IdentityTransformer):
 
 class PCAWhitener(IdentityTransformer):
     def __init__(self, copy=True, n_components=None):
+        if n_components > 1: n_components = int(n_components)
         self.whitener = decomposition.PCA(n_components=n_components,
                                           whiten=True, copy=copy)
 
