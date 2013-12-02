@@ -132,6 +132,21 @@ class Track:
         if self.h5 == None: self.open()
         return hdf5_getters.get_energy(self.h5)
 
+    @memoized
+    def get_segments_start(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_segments_start(self.h5)
+
+    @memoized
+    def get_beats_start(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_beats_start(self.h5)
+
+    @memoized
+    def get_tatums_start(self):
+        if self.h5 == None: self.open()
+        return hdf5_getters.get_tatums_start(self.h5)
+
 
 class Track_dataset:
     def __init__(self):

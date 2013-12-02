@@ -2,10 +2,12 @@ import load_song_data
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
-class KNearestNeighbor:
+class KNearestNeighbor(object):
 
-	def __init__(self, weights, training_data, training_labels, k=5):
-		self.knc = KNeighborsClassifier(k)
+	def __init__(self, weights, training_data, training_labels, 
+                 k=5,
+                 metric='euclidean'):
+		self.knc = KNeighborsClassifier(n_neighbors=k, metric=metric)
 		self.weights = np.array(weights)
 		self.training_data = np.array(training_data)
 		self.training_labels = np.array(training_labels)

@@ -82,6 +82,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
 
 def test_knn(train_list, test_list, featureExtractor, 
              k = 5,
+             metric='euclidean',
              weights=None, transform=None):
 
     data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
@@ -92,7 +93,8 @@ def test_knn(train_list, test_list, featureExtractor,
     # Transform data (preprocessor)
     if transform != None: data = transform.transform(data)
 
-    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k)
+    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k, metric=metric)
+    print "Running KNN with k=%d and %s metric" % (k, metric)
     accuracy = knn_classifier.calculate_accuracy(data, label)
     print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
 
@@ -134,6 +136,9 @@ def main(args):
     if args.features == 'combo2': 
         print "-- using combo2 features --"
         featureExtractor = feature_util.combo2_feature_extractor
+    if args.features == 'comboPlus': 
+        print "-- using comboPlus features --"
+        featureExtractor = feature_util.comboPlus_feature_extractor
 
     pairFeatureExtractor = feature_util.make_subtractivePairFeatureExtractor(featureExtractor, 
                                                                              # take_abs=False)
@@ -175,7 +180,9 @@ def main(args):
         #
         test_knn(train_list, test_list, featureExtractor, 
                  weights=weights, 
-                 transform=xform, k=args.k)
+                 transform=xform, 
+                 k=args.k,
+                 metric=args.knnMetric)
 
 
 if __name__ == '__main__':
@@ -206,6 +213,7 @@ if __name__ == '__main__':
 
     # Options for KNN classifier
     parser.add_argument('-k', dest='k', default=5, type=int)
+    parser.add_argument('--knnMetric', dest='knnMetric', default='euclidean')
 
     # Random seeds
     # for cross-validation (train|test partition)
@@ -219,7 +227,7 @@ if __name__ == '__main__':
     # select features
     parser.add_argument('-f', '--features', dest='features', 
                         default='combo',
-                        choices=['timbre', 'combo', 'combo2'])
+                        choices=['timbre', 'combo', 'combo2', 'comboPlus'])
 
     # Enable plotting
     parser.add_argument('--plot', dest='do_plot', action='store_true')
