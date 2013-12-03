@@ -20,23 +20,14 @@ import pdb
 def run_logistic(train_list, test_list, pairFeatureExtractor, 
                  rseed=10,
                  verbose=False, 
-                 pre_mode='none',
+                 pre_xform=transform.IdentityTransformer(),
                  npca=None,
                  reg='l2',
                  rstrength=1.0):
     # Initialize classifier
-    if pre_mode == 'scale': xform = transform.StandardScaler()
-    elif pre_mode == 'whiten': xform = transform.PCAWhitener()
-    elif pre_mode == 'both': xform = transform.ScaleThenWhiten()
-    elif pre_mode == 'pca': 
-        print "PCA: using %g components" % npca
-        xform = transform.PCAWhitener(n_components=npca)
-    else: xform = transform.IdentityTransformer()
-    print "Data preprocessor: %s" % str(type(xform))
-
     classifier = logistic.LogisticClassifier(reg=reg, 
                                              rstrength=rstrength,
-                                             dataTransformer=xform)
+                                             dataTransformer=pre_xform)
 
     def load_data(track_list, fit=True):
         t0 = time.time()
@@ -80,10 +71,80 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     return weights, classifier.transformer
 
 
+def run_LMNN(train_list, featureExtractor, pre_xform, 
+             diagonal=False, mu=0.5,
+             tempdir='temp/',
+             outdir='temp/',
+             libpath='lib/mLMNN2.4/'):
+    """Call MATLAB to run the Large Margin Nearest Neighbor (LMNN) algorithm to learn a
+    Mahalanobis matrix."""
+
+    t0 = time.time()
+    print "Loading training set...",
+    data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
+    print " completed in %d seconds." % int(time.time() - t0)
+
+    # Unsupervised preprocessing (PCA, etc.)
+    t0 = time.time()
+    print "Preprocessing data...",
+    if pre_xform != None: 
+        pre_xform.fit(data)
+        data = pre_xform.transform(data)
+    print " completed in %.03g seconds." % (time.time() - t0)
+
+    ##
+    # Save data for MATLAB to use
+    from scipy import io
+    params = {'diagonal':diagonal, 'mu':mu}
+    mdict = {'X':data, 'y':label, 'params':params}
+    outfile = os.path.join(tempdir,'LMNN-data.temp.mat')
+    print ("Creating temp file \'%s\'" % outfile),
+    io.savemat(outfile, mdict)
+    print " : %.02g MB" % (os.path.getsize(outfile)/(2.0**20))
+
+    ##
+    # Invoke MATLAB from the command line
+    # matlab -nodisplay -nojvm -r "cd('lib/mLMNN2.4/'); run('setpaths.m'); cd('main'); load('temp/LMNN.temp.mat'); [L,Det] = lmnn2(X',y'); save('temp/dummy.mat', 'L', 'Det', '-v6'); quit;"
+    Lfile = os.path.join(outdir,'LMNN-res.temp.mat')
+    logfile = os.path.join(outdir, 'LMNN.log')
+    # call_base = ("""matlab -nodisplay -nojvm -logfile '%s'""" % logfile)
+    call_base = """matlab -nodisplay -nojvm -r"""
+    
+    idict = {'libpath':libpath, 'outfile':outfile, 'Lfile':Lfile}
+    code = """cd '%(libpath)s'; run('setpaths.m'); cd '../../'; load('%(outfile)s'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu); save('%(Lfile)s', 'L', 'Det', '-v6'); quit;""" % idict
+    # callstring = """%s \"%s\"""" % (call_base, code)
+    import shlex
+    # callstring = shlex.split(call_base) + ["\"%s\"" % code]
+    callstring = shlex.split(call_base) + [code]
+
+
+    # callstring = """/bin/echo "hello world" """ # DEBUG
+
+    import subprocess as sp
+    t0 = time.time()
+    print "Invoking MATLAB with command:\n>> %s" % (call_base + (" \"%s\"" % code))
+    print " logging results to %s" % logfile
+    with open(logfile, 'w') as lf:
+        sp.call(callstring, stdout=lf, stderr=sys.stderr)
+    print "LMNN optimization completed in %.02g minutes." % ((time.time() - t0)/60.0)
+    print " results logged to %s" % logfile
+
+    ##
+    # PLACEHOLDER
+    # L = eye(data.shape[1]) # Identity Matrix
+    Ldict = io.loadmat(Lfile)
+    L = Ldict['L']
+
+    from sklearn import neighbors
+    print "Mahalanobis matrix: \n  %d dimensions\n  %d nonzero elements" % (L.shape[0], L.flatten().nonzero()[0].size)
+    metric = neighbors.DistanceMetric.get_metric('mahalanobis', VI=L)
+    return metric, pre_xform
+
+
 def test_knn(train_list, test_list, featureExtractor, 
              k = 5,
              metric='euclidean',
-             weights=None, transform=None):
+             weights=None, pre_xform=None):
 
     data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
 
@@ -91,7 +152,7 @@ def test_knn(train_list, test_list, featureExtractor,
         weights = ones(len(data[0])) # DUMMY
 
     # Transform data (preprocessor)
-    if transform != None: data = transform.transform(data)
+    if pre_xform != None: data = pre_xform.transform(data)
 
     knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k, metric=metric)
     print "Running KNN with k=%d and %s metric" % (k, metric)
@@ -101,7 +162,7 @@ def test_knn(train_list, test_list, featureExtractor,
     test_data, test_label = feature_util.get_feature_and_labels(featureExtractor, test_list)
 
     # Transform data (preprocessor)
-    if transform != None: test_data = transform.transform(test_data)
+    if pre_xform != None: test_data = pre_xform.transform(test_data)
 
     accuracy_test = knn_classifier.calculate_accuracy(test_data, test_label)
     print "==> KNN test accuracy: %.02f%%" % (accuracy_test*100.0)
@@ -111,9 +172,64 @@ def main(args):
 
     # Load Training List
     dataset = load_song_data.Track_dataset()
-    dataset.prune(args.nclique, rseed=args.rseed_xval)
+    total_clique_counter, restricted_clique_counter = dataset.prune(args.nclique, rseed=args.rseed_xval)
     train_list = dataset.get_tracks_train()
     test_list = dataset.get_tracks_test()
+
+    ##
+    # Histogram clique distribution
+    if args.do_plot:
+        def histo_counter(c):
+            sizes = c.values()
+            bins = arange(min(sizes) - 0.5, max(sizes) + 0.5, 1.0)
+            h, bins = histogram(sizes, bins)
+            centers = 0.5*(bins[1:] + bins[:-1])
+            return h, centers
+
+        def plot_histo((h,c), plotTitle, savename):
+            figure(1, figsize=(18,6)).clear()
+            subplot(1,3,1)
+            bar(c, h, width=1.0, align='center')
+            axvline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
+            xlabel("Clique size (tracks)")
+            ylabel("Frequency")
+            title("PDF")
+
+            cdf = cumsum(h[::-1])
+
+            subplot(1,3,2)
+            bar(c[::-1], cdf/float(cdf[-1]), width=1.0, align='center', color='r')
+            axvline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
+            xlabel("Clique size (tracks)")
+            ylabel("Cumulative Fraction (size < s)")
+            title("CDF")
+
+            subplot(1,3,3)
+            # plot(cdf/float(cdf[-1]), c[::-1], linewidth=1.5, color='r', marker='o')
+            # hlines(c[::-1], zeros((cdf.shape)), cdf/float(cdf[-1]), color='k')
+            # vlines(cdf/float(cdf[-1]), zeros((c.shape)), c[::-1], color='m')
+            # axhline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
+            # xlabel("Cumulative Fraction")
+            plot(cdf, c[::-1], linewidth=1.5, color='r', marker='o')
+            hlines(c[::-1], zeros((cdf.shape)), cdf, color='k')
+            vlines(cdf, zeros((c.shape)), c[::-1], color='m')
+            axhline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
+            ylim(ymin=0)
+            xlabel("Cumulative Count")
+            ylabel("Clique size (tracks)")
+            title("CDF, inverted")
+
+            suptitle(plotTitle)
+
+            show()
+            savefig(os.path.join(args.outdir,sfname)+".png")
+
+        sfname = "_".join(sys.argv) + "-histo-all"
+        plot_histo(histo_counter(total_clique_counter), "All Cliques", sfname)
+        
+        sfname = "_".join(sys.argv) + "-histo-res"
+        plot_histo(histo_counter(restricted_clique_counter), ("Top %d Cliques" % args.nclique), sfname)
+
 
     ##
     # Count tracks and cliques
@@ -144,19 +260,46 @@ def main(args):
                                                                              # take_abs=False)
                                                                              take_abs=True)
 
-    weights, xform = None, None
+    ##
+    # Set preprocessing transform
+    # NOTE: pre_xform.fit() should be called by the learning algorithm
+    # based on the particular dataset it requires.
+    if args.preprocess == 'scale': pre_xform = transform.StandardScaler()
+    elif args.preprocess == 'whiten': pre_xform = transform.PCAWhitener()
+    elif args.preprocess == 'both': pre_xform = transform.ScaleThenWhiten()
+    elif args.preprocess == 'pca': 
+        print "PCA: using %g components" % args.npca
+        pre_xform = transform.PCAWhitener(n_components=args.npca)
+    else: pre_xform = transform.IdentityTransformer()
+    print "Data preprocessor: %s" % str(type(pre_xform))
+
+    weights = None
+    metric = args.knnMetric
+
+
+    ##
+    # Run Large Margin Nearest Neighbors to generate a Mahalanobis matrix
+    #
+    if args.do_LMNN:
+        weights = None
+        metric, pre_xform = run_LMNN(train_list, featureExtractor, 
+                                     pre_xform,
+                                     diagonal=args.lmnnDiagonal,
+                                     mu=args.lmnnMu)
+
+    ##
+    # Run logistic regression to set feature weights
+    #
     if args.do_logistic:
-        weights, xform = run_logistic(train_list, test_list,
+        weights, pre_xform = run_logistic(train_list, test_list,
                                        pairFeatureExtractor,
                                        reg=args.reg,
                                        rseed=args.rseed_pairs,
                                        rstrength=args.rstrength,
                                        verbose=1,
-                                       pre_mode=args.preprocess,
-                                       npca=args.npca)
+                                       pre_xform=pre_xform)
         ##
         # Plot weight vector
-        #
         if args.do_plot:
             figure(1).clear()
             bar(range(weights.size), abs(weights.flatten()), width=0.9, align='center')
@@ -172,29 +315,39 @@ def main(args):
         print ""
         print "==> Weight vector (feature) dimension: %d" % weights.size
       
+    ##
+    # Run KNN
+    # If logistic or LMNN was run, will use the preprocessor transform
+    #
     if args.do_knn:  
-        ##
-        # Run KNN
-        # If logistic was run, will use the data scaler and weights
-        # as an improved metric
-        #
         test_knn(train_list, test_list, featureExtractor, 
                  weights=weights, 
-                 transform=xform, 
+                 pre_xform=pre_xform, 
                  k=args.k,
-                 metric=args.knnMetric)
+                 metric=metric,
+                 dWeight=args.knnDWeight)
 
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Cover Song Identifier")
 
+    ##
+    # Dataset options
+    #
     #parser.add_argument('-t', '--ntrain', dest='ntrain', type=int, default=5000)
     #parser.add_argument('-e', '--ntest', dest='ntest', type=int, default=1000)
     parser.add_argument('-c', '--nclique', dest='nclique', type=int, default=300)
+    parser.add_argument("--test_fraction", dest='test_fraction', type=float, default=0.33)
+    parser.add_argument('-f', '--features', dest='features', 
+                        default='combo',
+                        choices=['timbre', 'combo', 'combo2', 'comboPlus'])
 
-    parser.add_argument('--logistic', dest='do_logistic', action='store_true')
-    parser.add_argument('--knn', dest='do_knn', action='store_true')
+    ##
+    # Random seeds
+    # for cross-validation (train|test partition) and pair selection (logistic classifier)
+    parser.add_argument('--seed_xval', dest='rseed_xval', type=int, default=10)
+    parser.add_argument('--seed_pairs', dest='rseed_pairs', type=int, default=10)
 
     ##
     # Preprocessing mode and parameters
@@ -204,39 +357,53 @@ if __name__ == '__main__':
     parser.add_argument('--pca', dest='npca', type=float,
                         default=100)
 
+    ##
+    # Options for LMNN algorithm
+    parser.add_argument('--LMNN', dest='do_LMNN', action='store_true')
+    parser.add_argument('--lmnnDiagonal', dest='lmnnDiagonal', 
+                        action='store_true') # default = false
+    parser.add_argument('--lmnnMu', dest='lmnnMu', type=float, default=0.5)
+
+    ##
     # Options for logistic classifier
+    parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
                         default='l2',
                         choices=['l1','l2'])
     # Regularization strength: higher is stronger
     parser.add_argument('--rstrength', dest='rstrength', default=1.0, type=float)
 
+    ##
     # Options for KNN classifier
+    parser.add_argument('--knn', dest='do_knn', action='store_true')
     parser.add_argument('-k', dest='k', default=5, type=int)
     parser.add_argument('--knnMetric', dest='knnMetric', default='euclidean')
+    parser.add_argument('--knnDWeight', dest='knnDWeight',
+                        default='uniform',
+                        choices=['uniform', 'distance'])
 
-    # Random seeds
-    # for cross-validation (train|test partition)
-    # and pair selection (logistic classifier)
-    parser.add_argument('--seed_xval', dest='rseed_xval', type=int, default=10)
-    parser.add_argument('--seed_pairs', dest='rseed_pairs', type=int, default=10)
 
-    # Test fracton
-    parser.add_argument("--test_fraction", dest='test_fraction', type=float, default=0.33)
-
-    # select features
-    parser.add_argument('-f', '--features', dest='features', 
-                        default='combo',
-                        choices=['timbre', 'combo', 'combo2', 'comboPlus'])
 
     # Enable plotting
     parser.add_argument('--plot', dest='do_plot', action='store_true')
     parser.add_argument('--outdir', dest='outdir', default="output")
 
+    parser.add_argument('--NORUN', dest='NORUN', action='store_true')
+
     args = parser.parse_args()
-    if not args.do_logistic and not args.do_knn:
+    
+    if not args.do_logistic and not args.do_knn and not args.do_LMNN:
         args.do_knn = True
         args.do_logistic = True
+    # if args.do_LMNN:
+    #     args.do_knn = True
+
+    if args.NORUN:
+        print "NORUN mode: will not run any classifiers or learning"
+        print "            will only load dataset and generate histograms (if enabled)"
+        args.do_knn = False
+        args.do_logistic = False
+        args.do_LMNN = False
 
     # Make output directory
     if not os.path.isdir(args.outdir): os.mkdir(args.outdir)

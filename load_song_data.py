@@ -206,6 +206,7 @@ class Track_dataset:
         self.track_paths_train = {k:v for k,v in self.track_paths_full.items() if k in self.track_info_train}
         self.track_paths_test = {k:v for k,v in self.track_paths_full.items() if k in self.track_info_test}
 
+        return clique_counter, sorted_clique_counter
 
     def get_track(self, track_id):
         def path_loc(track_id):

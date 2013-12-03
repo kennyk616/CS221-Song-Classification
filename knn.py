@@ -6,8 +6,9 @@ class KNearestNeighbor(object):
 
 	def __init__(self, weights, training_data, training_labels, 
                  k=5,
-                 metric='euclidean'):
-		self.knc = KNeighborsClassifier(n_neighbors=k, metric=metric)
+                 metric='euclidean',
+                 dWeight='uniform'):
+		self.knc = KNeighborsClassifier(n_neighbors=k, metric=metric, weights=dWeight)
 		self.weights = np.array(weights)
 		self.training_data = np.array(training_data)
 		self.training_labels = np.array(training_labels)
