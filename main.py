@@ -137,24 +137,27 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
 
     from sklearn import neighbors
     print "Mahalanobis matrix: \n  %d dimensions\n  %d nonzero elements" % (L.shape[0], L.flatten().nonzero()[0].size)
-    metric = neighbors.DistanceMetric.get_metric('mahalanobis', VI=L)
-    return metric, pre_xform
+    # metric = neighbors.DistanceMetric.get_metric('mahalanobis', VI=L)
+    # return metric, pre_xform
+    return L, pre_xform
 
 
 def test_knn(train_list, test_list, featureExtractor, 
              k = 5,
              metric='euclidean',
-             weights=None, pre_xform=None):
+             weights=None, pre_xform=None, dWeight='uniform', metricKW={}):
 
     data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
-
-    if weights == None:
-        weights = ones(len(data[0])) # DUMMY
 
     # Transform data (preprocessor)
     if pre_xform != None: data = pre_xform.transform(data)
 
-    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k, metric=metric)
+    if weights == None:
+        # do this after PCA, to be sure dimension is correct...
+        weights = ones(len(data[0])) # DUMMY
+
+    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k, 
+                                          metric=metric, dWeight=dWeight, metricKW=metricKW)
     print "Running KNN with k=%d and %s metric" % (k, metric)
     accuracy = knn_classifier.calculate_accuracy(data, label)
     print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
@@ -274,18 +277,18 @@ def main(args):
     print "Data preprocessor: %s" % str(type(pre_xform))
 
     weights = None
-    metric = args.knnMetric
-
+    metric = args.knnMetric # default
+    L = None
 
     ##
     # Run Large Margin Nearest Neighbors to generate a Mahalanobis matrix
     #
     if args.do_LMNN:
-        weights = None
-        metric, pre_xform = run_LMNN(train_list, featureExtractor, 
-                                     pre_xform,
-                                     diagonal=args.lmnnDiagonal,
-                                     mu=args.lmnnMu)
+        L, pre_xform = run_LMNN(train_list, featureExtractor, 
+                                pre_xform,
+                                diagonal=args.lmnnDiagonal,
+                                mu=args.lmnnMu)
+        metric = 'mahalanobis'
 
     ##
     # Run logistic regression to set feature weights
@@ -325,7 +328,7 @@ def main(args):
                  pre_xform=pre_xform, 
                  k=args.k,
                  metric=metric,
-                 dWeight=args.knnDWeight)
+                 dWeight=args.knnDWeight, metricKW={'VI':L})
 
 
 if __name__ == '__main__':
@@ -377,7 +380,8 @@ if __name__ == '__main__':
     # Options for KNN classifier
     parser.add_argument('--knn', dest='do_knn', action='store_true')
     parser.add_argument('-k', dest='k', default=5, type=int)
-    parser.add_argument('--knnMetric', dest='knnMetric', default='euclidean')
+    parser.add_argument('--knnMetric', dest='knnMetric', 
+                        default='euclidean') # overridden by LMNN
     parser.add_argument('--knnDWeight', dest='knnDWeight',
                         default='uniform',
                         choices=['uniform', 'distance'])
