@@ -16,8 +16,6 @@ import knn
 import time
 import pdb
 
-from sklearn.metrics import confusion_matrix
-
 def run_logistic(train_list, test_list, pairFeatureExtractor, 
                  rseed=10,
                  verbose=False, 
@@ -57,6 +55,10 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Training accuracy: %.02f%%" % (score*100.0)
 
+    print "Logistic: TRAIN set"
+    train_X, train_y = train_data[0], train_data[1]
+    classifier.confusion_matrix(train_X, train_y, verbose=True, normalize=True)
+
     weights = classifier.getWeights()
     if verbose >= 2: print "Weights: %s" % str(weights)
 
@@ -69,20 +71,9 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
 
-    # ##
-    # # Confusion Matrix
-
-    # def confusion_binary(X,y,classifier):
-    #     y_pred = classifier.predict(X)
-    #     cmat = confusion_matrix(y, y_pred)
-
-    #     print "Confusion Matrix:"
-    #     print "      neg     | pos"
-    #     print "neg | %6g | %6g " % cmat[0,0]
-
-    # train_X, train_y = train_data[0], train_data[1]
-    # test_X, test_y = test_data[0], test_data[1]
-    # test_y_pred = classifier.predict(test_X)
+    print "Logistic: TEST set"
+    test_X, test_y = test_data[0], test_data[1]
+    classifier.confusion_matrix(test_X, test_y, verbose=True, normalize=True)
 
     return weights, classifier.transformer
 
@@ -201,11 +192,10 @@ def main(args):
         def plot_histo((h,c), plotTitle, savename):
             figure(1, figsize=(18,6)).clear()
             subplot(1,3,1)
-            bar(c, h, width=1.0, align='center')
+            bar(c, h, width=1.0, align='center', color='c')
             axvline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
             xlabel("Clique size (tracks)")
             ylabel("Frequency")
-            title("PDF")
 
             cdf = cumsum(h[::-1])
 
@@ -214,7 +204,6 @@ def main(args):
             axvline(1.5, color='k', alpha=0.5, linestyle='--', linewidth=1.5)
             xlabel("Clique size (tracks)")
             ylabel("Cumulative Fraction (size < s)")
-            title("CDF")
 
             subplot(1,3,3)
             # plot(cdf/float(cdf[-1]), c[::-1], linewidth=1.5, color='r', marker='o')
@@ -229,13 +218,14 @@ def main(args):
             ylim(ymin=0)
             xlabel("Cumulative Count")
             ylabel("Clique size (tracks)")
-            title("CDF, inverted")
 
             suptitle(plotTitle)
 
             show()
             savefig(os.path.join(args.outdir,sfname)+".png")
 
+        ## Turn this off: needs to only be run once for the whole set...
+        ## otherwise just makes a lot of junk .pngs
         sfname = "_".join(sys.argv) + "-histo-all"
         plot_histo(histo_counter(total_clique_counter), "All Cliques", sfname)
         

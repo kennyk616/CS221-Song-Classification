@@ -2,6 +2,8 @@ from pylab import *
 # from scipy.stats import futil
 # from scipy.sparse.csgraph import _validation
 from sklearn import linear_model, preprocessing
+from sklearn import metrics
+
 
 import random
 
@@ -35,6 +37,25 @@ class PairwiseSongClassifier(object):
         """
         raise Exception("Not implemented yet.")
 
+    ##
+    # Confusion Matrix
+    def confusion_matrix(self, X, y, verbose=True, normalize=True):
+        y_pred = self.predict(X)
+        cmat = metrics.confusion_matrix(y, y_pred)
+
+        if normalize: 
+            cmat = cmat /(1.0*sum(cmat))
+
+        if verbose:
+            print "Confusion Matrix:"
+            print "        neg    | pos"
+            print "  neg | %.04g | %.04g " % (cmat[0,0], cmat[0,1])
+            print "  pos | %.04g | %.04g " % (cmat[1,0], cmat[1,1])
+
+        return cmat
+
+    def predict(self, X):
+        raise Exception("Not implemented yet.")
 
     def pair_dataset(self, songList, pairFeatureExtractor, 
                      trimRatio=1.0,
@@ -102,6 +123,9 @@ class LogisticClassifier(PairwiseSongClassifier):
 
     def test(self, X_mat, y_list):
         return self.engine.score(X_mat, y_list)
+
+    def predict(self, X):
+        return self.engine.predict(X)
 
     def getMetric(self, pairFeatureExtractor):
         def metric(s1,s2):
