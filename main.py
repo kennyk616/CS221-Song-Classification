@@ -16,6 +16,7 @@ import knn
 import time
 import pdb
 
+from sklearn.metrics import confusion_matrix
 
 def run_logistic(train_list, test_list, pairFeatureExtractor, 
                  rseed=10,
@@ -68,6 +69,21 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
 
+    # ##
+    # # Confusion Matrix
+
+    # def confusion_binary(X,y,classifier):
+    #     y_pred = classifier.predict(X)
+    #     cmat = confusion_matrix(y, y_pred)
+
+    #     print "Confusion Matrix:"
+    #     print "      neg     | pos"
+    #     print "neg | %6g | %6g " % cmat[0,0]
+
+    # train_X, train_y = train_data[0], train_data[1]
+    # test_X, test_y = test_data[0], test_data[1]
+    # test_y_pred = classifier.predict(test_X)
+
     return weights, classifier.transformer
 
 
@@ -107,18 +123,12 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     # matlab -nodisplay -nojvm -r "cd('lib/mLMNN2.4/'); run('setpaths.m'); cd('main'); load('temp/LMNN.temp.mat'); [L,Det] = lmnn2(X',y'); save('temp/dummy.mat', 'L', 'Det', '-v6'); quit;"
     Lfile = os.path.join(outdir,'LMNN-res.temp.mat')
     logfile = os.path.join(outdir, 'LMNN.log')
-    # call_base = ("""matlab -nodisplay -nojvm -logfile '%s'""" % logfile)
     call_base = """matlab -nodisplay -nojvm -r"""
     
     idict = {'libpath':libpath, 'outfile':outfile, 'Lfile':Lfile}
     code = """cd '%(libpath)s'; run('setpaths.m'); cd '../../'; load('%(outfile)s'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu); save('%(Lfile)s', 'L', 'Det', '-v6'); quit;""" % idict
-    # callstring = """%s \"%s\"""" % (call_base, code)
     import shlex
-    # callstring = shlex.split(call_base) + ["\"%s\"" % code]
     callstring = shlex.split(call_base) + [code]
-
-
-    # callstring = """/bin/echo "hello world" """ # DEBUG
 
     import subprocess as sp
     t0 = time.time()
@@ -129,11 +139,10 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     print "LMNN optimization completed in %.02g minutes." % ((time.time() - t0)/60.0)
     print " results logged to %s" % logfile
 
-    ##
-    # PLACEHOLDER
-    # L = eye(data.shape[1]) # Identity Matrix
     Ldict = io.loadmat(Lfile)
     L = Ldict['L']
+
+    L = dot(L.T, L) ## TEST??? -> this seems to give more "correct" results.
 
     from sklearn import neighbors
     print "Mahalanobis matrix: \n  %d dimensions\n  %d nonzero elements" % (L.shape[0], L.flatten().nonzero()[0].size)
@@ -278,6 +287,7 @@ def main(args):
 
     weights = None
     metric = args.knnMetric # default
+    metricKW = {}
     L = None
 
     ##
@@ -289,6 +299,7 @@ def main(args):
                                 diagonal=args.lmnnDiagonal,
                                 mu=args.lmnnMu)
         metric = 'mahalanobis'
+        metricKW = {'VI':L}
 
     ##
     # Run logistic regression to set feature weights
@@ -328,7 +339,7 @@ def main(args):
                  pre_xform=pre_xform, 
                  k=args.k,
                  metric=metric,
-                 dWeight=args.knnDWeight, metricKW={'VI':L})
+                 dWeight=args.knnDWeight, metricKW=metricKW)
 
 
 if __name__ == '__main__':
