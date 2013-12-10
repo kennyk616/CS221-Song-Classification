@@ -1,4 +1,5 @@
 from pylab import *
+import transform
 
 ##
 # Helper functions for processing data and extracting features
@@ -13,6 +14,23 @@ def make_subtractivePairFeatureExtractor(featureExtractor, take_abs=False):
         else: return (f1 - f2)
 
     return pairFeatureExtractor
+
+###
+## WARNING: don't use this - causes memory leaks BIGTIME
+###
+# def make_metricPairFeatureExtractor(featureExtractor, L, pre_xform):
+#     """Simple one-dimensional feature representing the metric distance
+#     according to the Mahalanobis matrix L. Can be used as a 'feature vector'
+#     passed to some algorithm to learn a threshold."""
+
+#     def metricPairFeatureExtractor(s1,s2):
+#         f1 = featureExtractor(s1)
+#         f2 = featureExtractor(s2)
+#         delta = (f1-f2)
+#         delta = pre_xform.transform( reshape(delta, (len(delta),1)) )
+#         return dot( delta, dot(L, delta.T) ).flatten()
+
+#     return metricPairFeatureExtractor
 
 # n refers to how many samples we want to take from the feature
 def sample_segments_feature(feature, n=10):

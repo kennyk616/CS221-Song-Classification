@@ -13,7 +13,7 @@ class KNearestNeighbor(object):
                                         metric=metric, 
                                         weights=dWeight,
                                         **metricKW)
-        print "KNN: using \'%s\' metric with params %s" % (metric, str(metricKW))
+        print "KNN: using \'%s\' metric with params %s" % (metric, str(metricKW.keys()))
         self.weights = np.array(weights)
         self.training_data = np.array(training_data)
         self.training_labels = np.array(training_labels)

@@ -1,0 +1,33 @@
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+
+====================
+Generating pairwise dataset...
+Completed in 24.38 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 287)
+Completed in 0.17 s
+==> Training accuracy: 57.60%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.2799 | 0.2201 
+  pos | 0.2039 | 0.2961 
+
+====================
+Generating pairwise dataset...
+Completed in 37.59 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 38.07 s
+==> Test accuracy: 52.20%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.5098 | 0.4697 
+  pos | 0.008306 | 0.01214 
+
+==> Weight vector (feature) dimension: 287

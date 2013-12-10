@@ -69,3 +69,27 @@ class ScaleThenWhiten(IdentityTransformer):
 
     def transform(self, X):
         return self.scaler.transform(self.whitener.transform(X))
+
+
+class MahalanobisTransformer(IdentityTransformer):
+    def __init__(self, L, pre_xform=None):
+        self.pre_xform = pre_xform
+        self.L = L
+
+    def fit(self, X):
+        pass
+
+    def transform(self, X):
+        if self.pre_xform != None:
+            X = self.pre_xform.transform(X)
+
+        # Apply transform to each row of X
+        return dot(X, self.L.T)
+
+
+class MetricDistanceTransformer(MahalanobisTransformer):
+    def transform(self, X):
+        Xt = super(MetricDistanceTransformer, self).transform(X)
+        # return linalg.norm(X, axis=1) # norm each row
+        rvec = sqrt(np.sum(Xt*Xt, axis=1)) # norm each row
+        return reshape(rvec, (len(rvec),1))

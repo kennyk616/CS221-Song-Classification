@@ -91,10 +91,11 @@ class PairwiseSongClassifier(object):
         ##
         # Trim the different-clique list to a subset
         # with len(same_clique)*trimRatio pairs
-        samples_diff = int(trimRatio * len(same_clique))
-        rng = random.Random()
-        rng.seed(rseed)
-        diff_clique = rng.sample(diff_clique, samples_diff)
+        if trimRatio > 0:
+            samples_diff = int(trimRatio * len(same_clique))
+            rng = random.Random()
+            rng.seed(rseed)
+            diff_clique = rng.sample(diff_clique, samples_diff)
 
         ##
         # Extract features

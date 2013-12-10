@@ -28,7 +28,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
                                              rstrength=rstrength,
                                              dataTransformer=pre_xform)
 
-    def load_data(track_list, fit=True):
+    def load_data(track_list, fit=False, trim=1.0):
         t0 = time.time()
         if verbose: 
             print "\n===================="
@@ -36,6 +36,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
         data_dict = classifier.pair_dataset(track_list, 
                                        pairFeatureExtractor, 
                                        rseed=rseed,
+                                       trimRatio=trim,
                                        verbose=True)
         data = classifier.transformer.data_toarray(data_dict)
         if verbose: print "Completed in %.02f s" % (time.time() - t0)
@@ -46,12 +47,14 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
 
         return data
 
-    train_data = load_data(train_list, fit=True)
+    train_data = load_data(train_list, fit=True, trim=1.0)
 
     # Run classifier and show output
     t0 = time.time()
-    if verbose: print "Training logistic classifier on %d song pairs..." % len(train_data[0])
-    score = classifier.fit(*train_data)    
+    if verbose: 
+        print "Training logistic classifier on %d song pairs..." % len(train_data[0])
+        print "Train data dimensions: %s" % str(train_data[0].shape)
+    score = classifier.fit(*train_data)
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Training accuracy: %.02f%%" % (score*100.0)
 
@@ -65,7 +68,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     ##
     # Evaluate on test set
     # TO-DO: do a proper cross-validation here
-    test_data = load_data(test_list, fit=False)
+    test_data = load_data(test_list, fit=False, trim=-1)
     if verbose: print "Testing logistic classifier on %d song pairs..." % len(test_data[0])
     score = classifier.test(*test_data)
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
@@ -117,7 +120,8 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     call_base = """matlab -nodisplay -nojvm -r"""
     
     idict = {'libpath':libpath, 'outfile':outfile, 'Lfile':Lfile}
-    code = """cd '%(libpath)s'; run('setpaths.m'); cd '../../'; load('%(outfile)s'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu); save('%(Lfile)s', 'L', 'Det', '-v6'); quit;""" % idict
+    # code = """cd '%(libpath)s'; run('setpaths.m'); cd '../../'; load('%(outfile)s'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu); save('%(Lfile)s', 'L', 'Det', '-v6'); quit;""" % idict
+    code = """cd '%(libpath)s'; run('setpaths.m'); cd '../../'; load('%(outfile)s'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('%(Lfile)s', 'L', 'Det', '-v6'); quit;""" % idict
     import shlex
     callstring = shlex.split(call_base) + [code]
 
@@ -133,13 +137,13 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     Ldict = io.loadmat(Lfile)
     L = Ldict['L']
 
-    L = dot(L.T, L) ## TEST??? -> this seems to give more "correct" results.
+    L2 = dot(L.T, L) ## TEST??? -> this seems to give more "correct" results.
 
     from sklearn import neighbors
     print "Mahalanobis matrix: \n  %d dimensions\n  %d nonzero elements" % (L.shape[0], L.flatten().nonzero()[0].size)
     # metric = neighbors.DistanceMetric.get_metric('mahalanobis', VI=L)
     # return metric, pre_xform
-    return L, pre_xform
+    return L, L2, pre_xform
 
 
 def test_knn(train_list, test_list, featureExtractor, 
@@ -284,12 +288,29 @@ def main(args):
     # Run Large Margin Nearest Neighbors to generate a Mahalanobis matrix
     #
     if args.do_LMNN:
-        L, pre_xform = run_LMNN(train_list, featureExtractor, 
+        L, L2, pre_xform = run_LMNN(train_list, featureExtractor, 
                                 pre_xform,
                                 diagonal=args.lmnnDiagonal,
                                 mu=args.lmnnMu)
         metric = 'mahalanobis'
-        metricKW = {'VI':L}
+        metricKW = {'VI':L2} # need L'L for metric -> KNN
+
+    ##
+    # Test a pairwise binary classifier using
+    # a Mahalanobis metric, by hacking the logistic apparatus
+    # and using a custom featureExtractor to pre-transform the data
+    if args.do_binclass_maha and L != None:
+
+        # metricPairFeatureExtractor = feature_util.make_metricPairFeatureExtractor(featureExtractor, L, pre_xform)
+        pre_xform_maha = transform.MetricDistanceTransformer(L, pre_xform)
+
+        weights, px = run_logistic(train_list, test_list,
+                                   pairFeatureExtractor,
+                                   reg=args.reg,
+                                   rseed=args.rseed_pairs,
+                                   rstrength=args.rstrength,
+                                   verbose=1,
+                                   pre_xform=pre_xform_maha)
 
     ##
     # Run logistic regression to set feature weights
@@ -305,7 +326,7 @@ def main(args):
         ##
         # Plot weight vector
         if args.do_plot:
-            figure(1).clear()
+            figure(2, figsize=(10,6)).clear()
             bar(range(weights.size), abs(weights.flatten()), width=0.9, align='center')
             # bar(range(weights.size), weights.flatten(), width=0.9, align='center')
             xlim(0,weights.size)
@@ -367,6 +388,8 @@ if __name__ == '__main__':
     parser.add_argument('--lmnnDiagonal', dest='lmnnDiagonal', 
                         action='store_true') # default = false
     parser.add_argument('--lmnnMu', dest='lmnnMu', type=float, default=0.5)
+    # Run logistic classifier afterwards
+    parser.add_argument('--mahaClass', dest='do_binclass_maha', action='store_true')
 
     ##
     # Options for logistic classifier
