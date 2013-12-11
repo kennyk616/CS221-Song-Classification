@@ -2,8 +2,6 @@ import load_song_data
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
-import ipdb
-
 class KNearestNeighbor(object):
 
     def __init__(self, weights, training_data, training_labels, 
@@ -96,6 +94,3 @@ class KNearestNeighbor(object):
 
         accuracy = sum(y_pred == y_true) / float(len(y_pred))
         return accuracy
-
-        # ipdb.set_trace();
-
