@@ -146,7 +146,7 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     return L, L2, pre_xform
 
 
-def test_knn(train_list, test_list, featureExtractor, 
+def test_knn(train_list, test_list, featureExtractor, knn_relax_n,
              k = 5,
              metric='euclidean',
              weights=None, pre_xform=None, dWeight='uniform', metricKW={}):
@@ -173,6 +173,24 @@ def test_knn(train_list, test_list, featureExtractor,
 
     accuracy_test = knn_classifier.calculate_accuracy(test_data, test_label)
     print "==> KNN test accuracy: %.02f%%" % (accuracy_test*100.0)
+
+    print "Running KNN relaxed with k=%d and %s metric" % (k, metric)
+    accuracy_relax = knn_classifier.calculate_accuracy_relax(data, label, knn_relax_n)
+    print "==> KNN relax training accuracy: %.02f%%" % (accuracy_relax*100.0)
+
+    accuracy_test_relax = knn_classifier.calculate_accuracy_relax(test_data, test_label, knn_relax_n)
+    print "==> KNN relax test accuracy: %.02f%%" % (accuracy_test_relax*100.0)
+
+"""
+    print "Running KNN predict with k=%d and %s metric" % (k, metric)
+    accuracy_predict = knn_classifier.calculate_accuracy_predict(data, label)
+    print "==> KNN predict training accuracy: %.02f%%" % (accuracy_predict*100.0)
+
+    accuracy_test_predict = knn_classifier.calculate_accuracy_predict(test_data, test_label)
+    print "==> KNN predict test accuracy: %.02f%%" % (accuracy_test_predict*100.0)
+"""
+
+
 
 
 def main(args):
@@ -350,7 +368,7 @@ def main(args):
                  pre_xform=pre_xform, 
                  k=args.k,
                  metric=metric,
-                 dWeight=args.knnDWeight, metricKW=metricKW)
+                 dWeight=args.knnDWeight, metricKW=metricKW, knn_relax_n=args.knn_relax_n)
 
 
 if __name__ == '__main__':
@@ -409,6 +427,7 @@ if __name__ == '__main__':
     parser.add_argument('--knnDWeight', dest='knnDWeight',
                         default='uniform',
                         choices=['uniform', 'distance'])
+    parser.add_argument('--knn_relax_n', dest='knn_relax_n', default = 5, type=int)
 
 
 
