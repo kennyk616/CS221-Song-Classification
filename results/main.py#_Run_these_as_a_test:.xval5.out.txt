@@ -1,0 +1,5 @@
+>> python main.py --seed_xval 1 --seed_pairs 1 # Run these as a test:
+>> python main.py --seed_xval 2 --seed_pairs 2 # Run these as a test:
+>> python main.py --seed_xval 3 --seed_pairs 3 # Run these as a test:
+>> python main.py --seed_xval 4 --seed_pairs 4 # Run these as a test:
+>> python main.py --seed_xval 5 --seed_pairs 5 # Run these as a test:

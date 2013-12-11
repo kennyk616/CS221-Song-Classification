@@ -60,7 +60,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
         print "Train data dimensions: %s" % str(train_data[0].shape)
     score = classifier.fit(*train_data)
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
-    if verbose: print "==> Training accuracy: %.02f%%" % (score*100.0)
+    if verbose: print "==> Logistic training accuracy: %.02f%%" % (score*100.0)
 
     weights = classifier.getWeights()
     if verbose >= 2: print "Weights: %s" % str(weights)
@@ -80,7 +80,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
         if verbose: print "Testing logistic classifier on %d song pairs..." % len(test_data[0])
         score = classifier.test(*test_data)
         if verbose: print "Completed in %.02f s" % (time.time() - t0)
-        if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
+        if verbose: print "==> Logistic test accuracy: %.02f%%" % (score*100.0)
 
         print "Logistic: TEST set"
         test_X, test_y = test_data[0], test_data[1]
