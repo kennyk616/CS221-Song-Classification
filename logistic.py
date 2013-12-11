@@ -139,6 +139,19 @@ class LogisticClassifier(PairwiseSongClassifier):
 
         return metric
 
+    def getKNNMetric(self, take_abs=True):
+        i_diff = 0 if (self.classes_[0] == Y_DIFF) else 1
+        def metric(f1,f2): # operate on pre-extracted features
+            if take_abs: X = np.abs(f1-f2)
+            else: X =(f1 - f2)
+            X.reshape( (1,len(X)) )
+            pp = self.engine.predict_proba(X)
+
+            # return p(diff) - so high score = large distance
+            return pp[i_diff]
+
+        return metric
+
     def getWeights(self):
         """Return the internal weight vector from them logistic classifier."""
         return array(self.engine.coef_).copy()

@@ -22,7 +22,8 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
                  pre_xform=transform.IdentityTransformer(),
                  npca=None,
                  reg='l2',
-                 rstrength=1.0):
+                 rstrength=1.0,
+                 trim_train=1.0):
     # Initialize classifier
     classifier = logistic.LogisticClassifier(reg=reg, 
                                              rstrength=rstrength,
@@ -47,7 +48,7 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
 
         return data
 
-    train_data = load_data(train_list, fit=True, trim=1.0)
+    train_data = load_data(train_list, fit=True, trim=trim_train)
 
     # Run classifier and show output
     t0 = time.time()
@@ -322,7 +323,8 @@ def main(args):
                                        rseed=args.rseed_pairs,
                                        rstrength=args.rstrength,
                                        verbose=1,
-                                       pre_xform=pre_xform)
+                                       pre_xform=pre_xform,
+                                       trim_train=args.pairTrimRatio)
         ##
         # Plot weight vector
         if args.do_plot:
@@ -399,6 +401,7 @@ if __name__ == '__main__':
                         choices=['l1','l2'])
     # Regularization strength: higher is stronger
     parser.add_argument('--rstrength', dest='rstrength', default=1.0, type=float)
+    parser.add_argument('--trim', dest='pairTrimRatio', default=1.0, type=float)
 
     ##
     # Options for KNN classifier
