@@ -23,7 +23,8 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
                  npca=None,
                  reg='l2',
                  rstrength=1.0,
-                 trim_train=1.0):
+                 trim_train=1.0,
+                 do_test=True):
     # Initialize classifier
     classifier = logistic.LogisticClassifier(reg=reg, 
                                              rstrength=rstrength,
@@ -59,25 +60,29 @@ def run_logistic(train_list, test_list, pairFeatureExtractor,
     if verbose: print "Completed in %.02f s" % (time.time() - t0)
     if verbose: print "==> Training accuracy: %.02f%%" % (score*100.0)
 
-    print "Logistic: TRAIN set"
-    train_X, train_y = train_data[0], train_data[1]
-    classifier.confusion_matrix(train_X, train_y, verbose=True, normalize=True)
-
     weights = classifier.getWeights()
     if verbose >= 2: print "Weights: %s" % str(weights)
 
     ##
-    # Evaluate on test set
-    # TO-DO: do a proper cross-validation here
-    test_data = load_data(test_list, fit=False, trim=-1)
-    if verbose: print "Testing logistic classifier on %d song pairs..." % len(test_data[0])
-    score = classifier.test(*test_data)
-    if verbose: print "Completed in %.02f s" % (time.time() - t0)
-    if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
+    # Run tests of logistic classifier
+    # can skip this for debugging KNN
+    if do_test:
+        print "Logistic: TRAIN set"
+        train_X, train_y = train_data[0], train_data[1]
+        classifier.confusion_matrix(train_X, train_y, verbose=True, normalize=True)
 
-    print "Logistic: TEST set"
-    test_X, test_y = test_data[0], test_data[1]
-    classifier.confusion_matrix(test_X, test_y, verbose=True, normalize=True)
+        ##
+        # Evaluate on test set
+        # TO-DO: do a proper cross-validation here
+        test_data = load_data(test_list, fit=False, trim=-1)
+        if verbose: print "Testing logistic classifier on %d song pairs..." % len(test_data[0])
+        score = classifier.test(*test_data)
+        if verbose: print "Completed in %.02f s" % (time.time() - t0)
+        if verbose: print "==> Test accuracy: %.02f%%" % (score*100.0)
+
+        print "Logistic: TEST set"
+        test_X, test_y = test_data[0], test_data[1]
+        classifier.confusion_matrix(test_X, test_y, verbose=True, normalize=True)
 
     return weights, classifier.transformer
 
@@ -147,24 +152,24 @@ def run_LMNN(train_list, featureExtractor, pre_xform,
     return L, L2, pre_xform
 
 
-def test_knn(train_list, test_list, featureExtractor, knn_relax_n,
-             k = 5,
+def test_knn(train_list, test_list, featureExtractor, 
+             k = 5, knn_relax_n=5,
              metric='euclidean',
              weights=None, pre_xform=None, dWeight='uniform', metricKW={}):
 
-    data, label = feature_util.get_feature_and_labels(featureExtractor, train_list)
+    train_data, train_label = feature_util.get_feature_and_labels(featureExtractor, train_list)
 
     # Transform data (preprocessor)
-    if pre_xform != None: data = pre_xform.transform(data)
+    if pre_xform != None: train_data = pre_xform.transform(train_data)
 
     if weights == None:
         # do this after PCA, to be sure dimension is correct...
-        weights = ones(len(data[0])) # DUMMY
+        weights = ones(len(train_data[0])) # DUMMY
 
-    knn_classifier = knn.KNearestNeighbor(weights, data, label, k=k, 
+    knn_classifier = knn.KNearestNeighbor(weights, train_data, train_label, k=k, 
                                           metric=metric, dWeight=dWeight, metricKW=metricKW)
     print "Running KNN with k=%d and %s metric" % (k, metric)
-    accuracy = knn_classifier.calculate_accuracy(data, label)
+    accuracy = knn_classifier.calculate_accuracy(train_data, train_label)
     print "==> KNN training accuracy: %.02f%%" % (accuracy*100.0)
 
     test_data, test_label = feature_util.get_feature_and_labels(featureExtractor, test_list)
@@ -175,21 +180,25 @@ def test_knn(train_list, test_list, featureExtractor, knn_relax_n,
     accuracy_test = knn_classifier.calculate_accuracy(test_data, test_label)
     print "==> KNN test accuracy: %.02f%%" % (accuracy_test*100.0)
 
-    print "Running KNN relaxed with k=%d and %s metric" % (k, metric)
-    accuracy_relax = knn_classifier.calculate_accuracy_relax(data, label, knn_relax_n)
+    ##
+    # Test relaxed test accuracy (top n matches)
+    #
+    print "Checking KNN, relaxed to top %d membership" % knn_relax_n
+    accuracy_relax = knn_classifier.calculate_accuracy_relax(train_data, train_label, knn_relax_n)
     print "==> KNN relax training accuracy: %.02f%%" % (accuracy_relax*100.0)
 
     accuracy_test_relax = knn_classifier.calculate_accuracy_relax(test_data, test_label, knn_relax_n)
     print "==> KNN relax test accuracy: %.02f%%" % (accuracy_test_relax*100.0)
 
-"""
-    print "Running KNN predict with k=%d and %s metric" % (k, metric)
-    accuracy_predict = knn_classifier.calculate_accuracy_predict(data, label)
-    print "==> KNN predict training accuracy: %.02f%%" % (accuracy_predict*100.0)
+    ##
+    # DEBUG
+    ##
+    # print "Running KNN predict with k=%d and %s metric" % (k, metric)
+    # accuracy_predict = knn_classifier.calculate_accuracy_predict(train_data, train_label)
+    # print "==> KNN predict training accuracy: %.02f%%" % (accuracy_predict*100.0)
 
-    accuracy_test_predict = knn_classifier.calculate_accuracy_predict(test_data, test_label)
-    print "==> KNN predict test accuracy: %.02f%%" % (accuracy_test_predict*100.0)
-"""
+    # accuracy_test_predict = knn_classifier.calculate_accuracy_predict(test_data, test_label)
+    # print "==> KNN predict test accuracy: %.02f%%" % (accuracy_test_predict*100.0)
 
 
 
@@ -342,7 +351,8 @@ def main(args):
                                        rstrength=args.rstrength,
                                        verbose=1,
                                        pre_xform=pre_xform,
-                                       trim_train=args.pairTrimRatio)
+                                       trim_train=args.pairTrimRatio,
+                                       do_test=args.testLogistic)
         ##
         # Plot weight vector
         if args.do_plot:
@@ -420,6 +430,7 @@ if __name__ == '__main__':
     # Regularization strength: higher is stronger
     parser.add_argument('--rstrength', dest='rstrength', default=1.0, type=float)
     parser.add_argument('--trim', dest='pairTrimRatio', default=1.0, type=float)
+    parser.add_argument('--noTestLogistic', dest='testLogistic', action='store_false') # by default, test logistic classifer on dev set
 
     ##
     # Options for KNN classifier
