@@ -9,14 +9,22 @@ RESDIR="results"
 for i in $(seq $1)
 do
 CMD="$BASE --seed_xval $i --seed_pairs $i $2"
-FNAME="$RESDIR/$(echo "$2" | sed "y/ /_/").xval$1.$i" # tag with number of runs, and index
-OUTFILE="$FNAME.out"
+FNAME="$RESDIR/main.py$(echo "$2" | sed "y/ /_/").xval$1.$i" # tag with number of runs, and index
+OUTFILE="$FNAME.out.txt"
 ERRFILE="$OUTFILE.err.log"
+
+touch $OUTFILE
+touch $ERRFILE
 
 SCRIPT="$OUTFILE.temp.sh" # batch submit script
 rm -f $SCRIPT # delete old script
+echo "#!/bin/bash\n" > $SCRIPT
+
 echo "Submitting job with command:"
-echo "$CMD" | tee $SCRIPT
+echo "$CMD" | tee -a $SCRIPT
 echo "Saving output to \"$OUTFILE\""
-qsub -cwd -testq=1 -pe fah 1 $CMD -o $OUTFILE -e $ERRFILE $SCRIPT
+
+# OPTS=""
+OPTS="-l testq=1"
+qsub -cwd $OPTS -o $OUTFILE -e $ERRFILE $SCRIPT
 done
