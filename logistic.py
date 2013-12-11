@@ -110,9 +110,10 @@ class PairwiseSongClassifier(object):
 
 
 class LogisticClassifier(PairwiseSongClassifier):
-    def __init__(self, reg='l2', rstrength=1.0, dataTransformer=transform.IdentityTransformer):
+    def __init__(self, reg='l2', rstrength=1.0, intercept_scaling=1.0, dataTransformer=transform.IdentityTransformer):
         super(LogisticClassifier, self).__init__(dataTransformer)
         self.engine = linear_model.LogisticRegression(penalty=reg,
+                                                      intercept_scaling=intercept_scaling,
                                                       C = 1.0/rstrength,
                                                       dual=False)
 
@@ -140,7 +141,7 @@ class LogisticClassifier(PairwiseSongClassifier):
         return metric
 
     def getKNNMetric(self, take_abs=True):
-        i_diff = 0 if (self.classes_[0] == Y_DIFF) else 1
+        i_diff = 0 if (self.engine.classes_[0] == Y_DIFF) else 1
         def metric(f1,f2): # operate on pre-extracted features
             if take_abs: X = np.abs(f1-f2)
             else: X =(f1 - f2)
@@ -151,6 +152,11 @@ class LogisticClassifier(PairwiseSongClassifier):
             return pp[i_diff]
 
         return metric
+
+    # def getKNNMetric(self, take_abs=True):
+    #     def metric(f1,f2): # operate on pre-extracted features
+    #         return 1.0 / (1.0 + exp(-1*sum(abs(f1-f2))))
+    #     return metric
 
     def getWeights(self):
         """Return the internal weight vector from them logistic classifier."""

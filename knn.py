@@ -8,10 +8,12 @@ class KNearestNeighbor(object):
                  k=5,
                  metric='euclidean',
                  dWeight='uniform',
+                 algorithm='auto',
                  metricKW={}):
         self.knc = KNeighborsClassifier(n_neighbors=k, 
                                         metric=metric, 
                                         weights=dWeight,
+                                        algorithm='auto',
                                         **metricKW)
         print "KNN: using \'%s\' metric with params %s" % (metric, str(metricKW.keys()))
         self.weights = np.array(weights)
