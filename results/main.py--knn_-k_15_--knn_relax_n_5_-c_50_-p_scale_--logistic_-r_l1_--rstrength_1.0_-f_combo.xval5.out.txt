@@ -1,0 +1,205 @@
+>> python main.py --seed_xval 1 --seed_pairs 1 --knn -k 15 --knn_relax_n 5 -c 50 -p scale --logistic -r l1 --rstrength 1.0 -f combo
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using combo features --
+Data preprocessor: <class 'transform.StandardScaler'>
+
+====================
+Generating pairwise dataset...
+Completed in 17.73 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 243)
+Completed in 0.51 s
+==> Logistic training accuracy: 59.37%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.2931 | 0.2069 
+  pos | 0.1994 | 0.3006 
+
+====================
+Generating pairwise dataset...
+Completed in 15.86 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 16.51 s
+==> Logistic test accuracy: 51.12%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.4999 | 0.4796 
+  pos | 0.009125 | 0.01132 
+
+==> Weight vector (feature) dimension: 243
+KNN: using 'euclidean' metric with params []
+Running KNN with k=15 and euclidean metric
+==> KNN training accuracy: 18.91%
+==> KNN test accuracy: 3.82%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 53.37%
+==> KNN relax test accuracy: 14.89%
+>> python main.py --seed_xval 2 --seed_pairs 2 --knn -k 15 --knn_relax_n 5 -c 50 -p scale --logistic -r l1 --rstrength 1.0 -f combo
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using combo features --
+Data preprocessor: <class 'transform.StandardScaler'>
+
+====================
+Generating pairwise dataset...
+Completed in 15.31 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 243)
+Completed in 0.50 s
+==> Logistic training accuracy: 58.72%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.2898 | 0.2102 
+  pos | 0.2026 | 0.2974 
+
+====================
+Generating pairwise dataset...
+Completed in 12.27 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 12.94 s
+==> Logistic test accuracy: 52.60%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.5151 | 0.4645 
+  pos | 0.009505 | 0.01094 
+
+==> Weight vector (feature) dimension: 243
+KNN: using 'euclidean' metric with params []
+Running KNN with k=15 and euclidean metric
+==> KNN training accuracy: 18.43%
+==> KNN test accuracy: 5.73%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 49.04%
+==> KNN relax test accuracy: 19.08%
+>> python main.py --seed_xval 3 --seed_pairs 3 --knn -k 15 --knn_relax_n 5 -c 50 -p scale --logistic -r l1 --rstrength 1.0 -f combo
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using combo features --
+Data preprocessor: <class 'transform.StandardScaler'>
+
+====================
+Generating pairwise dataset...
+Completed in 16.28 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 243)
+Completed in 0.60 s
+==> Logistic training accuracy: 59.68%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.2978 | 0.2022 
+  pos | 0.2011 | 0.2989 
+
+====================
+Generating pairwise dataset...
+Completed in 16.42 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 17.19 s
+==> Logistic test accuracy: 50.69%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.496 | 0.4836 
+  pos | 0.009476 | 0.01097 
+
+==> Weight vector (feature) dimension: 243
+KNN: using 'euclidean' metric with params []
+Running KNN with k=15 and euclidean metric
+==> KNN training accuracy: 20.83%
+==> KNN test accuracy: 3.82%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 54.97%
+==> KNN relax test accuracy: 20.23%
+>> python main.py --seed_xval 4 --seed_pairs 4 --knn -k 15 --knn_relax_n 5 -c 50 -p scale --logistic -r l1 --rstrength 1.0 -f combo
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using combo features --
+Data preprocessor: <class 'transform.StandardScaler'>
+
+====================
+Generating pairwise dataset...
+Completed in 17.00 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 243)
+Completed in 0.64 s
+==> Logistic training accuracy: 60.21%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.2974 | 0.2026 
+  pos | 0.1952 | 0.3048 
+
+====================
+Generating pairwise dataset...
+Completed in 15.63 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 16.46 s
+==> Logistic test accuracy: 52.17%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.5105 | 0.469 
+  pos | 0.00933 | 0.01111 
+
+==> Weight vector (feature) dimension: 243
+KNN: using 'euclidean' metric with params []
+Running KNN with k=15 and euclidean metric
+==> KNN training accuracy: 18.91%
+==> KNN test accuracy: 5.34%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 52.88%
+==> KNN relax test accuracy: 19.47%
+>> python main.py --seed_xval 5 --seed_pairs 5 --knn -k 15 --knn_relax_n 5 -c 50 -p scale --logistic -r l1 --rstrength 1.0 -f combo
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using combo features --
+Data preprocessor: <class 'transform.StandardScaler'>
+
+====================
+Generating pairwise dataset...
+Completed in 48.55 s
+Preprocessing data...
+Training logistic classifier on 8246 song pairs...
+Train data dimensions: (8246, 243)
+Completed in 0.64 s
+==> Logistic training accuracy: 59.68%
+Logistic: TRAIN set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.298 | 0.202 
+  pos | 0.2012 | 0.2988 
+
+====================
+Generating pairwise dataset...
+Completed in 22.15 s
+Preprocessing data...
+Testing logistic classifier on 34191 song pairs...
+Completed in 22.94 s
+==> Logistic test accuracy: 58.43%
+Logistic: TEST set
+Confusion Matrix:
+        neg    | pos
+  neg | 0.5751 | 0.4045 
+  pos | 0.01117 | 0.009271 
+
+==> Weight vector (feature) dimension: 243
+KNN: using 'euclidean' metric with params []
+Running KNN with k=15 and euclidean metric
+==> KNN training accuracy: 19.87%
+==> KNN test accuracy: 6.49%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 52.24%
+==> KNN relax test accuracy: 20.99%

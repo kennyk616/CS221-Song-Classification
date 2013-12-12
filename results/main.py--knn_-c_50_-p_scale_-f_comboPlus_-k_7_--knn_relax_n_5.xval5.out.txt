@@ -1,0 +1,60 @@
+>> python main.py --seed_xval 1 --seed_pairs 1 --knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 23.56%
+==> KNN test accuracy: 6.11%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 82.21%
+==> KNN relax test accuracy: 17.94%
+>> python main.py --seed_xval 2 --seed_pairs 2 --knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 23.08%
+==> KNN test accuracy: 3.82%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 83.65%
+==> KNN relax test accuracy: 21.76%
+>> python main.py --seed_xval 3 --seed_pairs 3 --knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 23.08%
+==> KNN test accuracy: 6.87%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 82.69%
+==> KNN relax test accuracy: 22.90%
+>> python main.py --seed_xval 4 --seed_pairs 4 --knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 24.52%
+==> KNN test accuracy: 4.58%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 84.78%
+==> KNN relax test accuracy: 17.18%
+>> python main.py --seed_xval 5 --seed_pairs 5 --knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 22.76%
+==> KNN test accuracy: 9.16%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 79.97%
+==> KNN relax test accuracy: 16.79%

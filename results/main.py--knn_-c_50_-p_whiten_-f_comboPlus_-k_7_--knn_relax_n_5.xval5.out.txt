@@ -1,0 +1,60 @@
+>> python main.py --seed_xval 1 --seed_pairs 1 --knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 19.87%
+==> KNN test accuracy: 2.67%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 76.60%
+==> KNN relax test accuracy: 9.92%
+>> python main.py --seed_xval 2 --seed_pairs 2 --knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 19.07%
+==> KNN test accuracy: 2.29%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 79.97%
+==> KNN relax test accuracy: 15.65%
+>> python main.py --seed_xval 3 --seed_pairs 3 --knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 18.27%
+==> KNN test accuracy: 3.82%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 79.33%
+==> KNN relax test accuracy: 15.27%
+>> python main.py --seed_xval 4 --seed_pairs 4 --knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 19.39%
+==> KNN test accuracy: 3.82%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 80.77%
+==> KNN relax test accuracy: 14.12%
+>> python main.py --seed_xval 5 --seed_pairs 5 --knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.PCAWhitener'>
+KNN: using 'euclidean' metric with params []
+Running KNN with k=7 and euclidean metric
+==> KNN training accuracy: 20.03%
+==> KNN test accuracy: 2.29%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 77.88%
+==> KNN relax test accuracy: 13.36%
