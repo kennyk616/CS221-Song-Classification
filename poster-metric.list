@@ -1,0 +1,9 @@
+# Test metric learning
+# c=50, k=7, n=5, vary mu to LMNN
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.1
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.01
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.001
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.0001
+--LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.00001

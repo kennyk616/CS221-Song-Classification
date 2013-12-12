@@ -161,6 +161,9 @@ def test_knn(train_list, test_list, featureExtractor,
 
     train_data, train_label = feature_util.get_feature_and_labels(featureExtractor, train_list)
 
+    # Fit preprocessor, if necessary (if logistic not run - for baseline only)
+    if pre_xform != None and not pre_xform.is_fit: pre_xform.fit(train_data)
+
     # Transform data (preprocessor)
     if pre_xform != None: train_data = pre_xform.transform(train_data)
 

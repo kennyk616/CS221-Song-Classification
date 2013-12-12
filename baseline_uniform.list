@@ -1,0 +1,8 @@
+# test without learning any features
+--knn -c 50 -p none -f combo -k 7 --knn_relax_n 5
+--knn -c 50 -p scale -f combo -k 7 --knn_relax_n 5
+--knn -c 50 -p whiten -f combo -k 7 --knn_relax_n 5
+
+--knn -c 50 -p none -f comboPlus -k 7 --knn_relax_n 5
+--knn -c 50 -p scale -f comboPlus -k 7 --knn_relax_n 5
+--knn -c 50 -p whiten -f comboPlus -k 7 --knn_relax_n 5

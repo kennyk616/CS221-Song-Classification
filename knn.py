@@ -26,36 +26,6 @@ class KNearestNeighbor(object):
         test_data = np.array(test_tracks) * self.weights
         return self.knc.score(test_data, labels)
 
-    # def calculate_accuracy_relax_old(self, test_tracks, test_labels, n):
-    #     test_data = np.array(test_tracks) * self.weights
-    #     predict_probability = self.knc.predict_proba(test_tracks)
-
-    #     predict = self.knc.predict(test_tracks)
-        
-    #     nCorrect = 0
-    #     nWrong = 0
-        
-    #     for idx, prob in enumerate(predict_probability):
-    #         indecies = sorted(range(len(prob)), key=lambda i:prob[i])[-1*n:]
-    #         #print indecies
-    #         correct = False
-    #         for i in indecies:
-    #             if self.labels[i] == test_labels[idx]:
-    #                 correct = True
-    #             if self.labels[i] != predict[idx]:
-    #                 print "idx = ", idx
-    #                 print "label_real = ", test_labels[idx]
-    #                 print "label_predict = ", predict[idx]
-    #                 print "label_predict_proba = ", self.labels[i]
-    #         if correct == True:
-    #             nCorrect += 1
-    #         else:
-    #             nWrong += 1
-
-    #     print "correct = ", nCorrect
-    #     print "wrong = ", nWrong
-    #     return nCorrect*1.0/(nCorrect+nWrong)
-
     # when knn returns a list of neighboring labels, if the actual label is wihin the 
     # top n labels, this classifier will consider it correct. 
     def calculate_accuracy_relax(self, data, labels, n):
@@ -74,20 +44,6 @@ class KNearestNeighbor(object):
         scorelist = [check_found(ps,yt,n) for ps,yt in zip(y_pred, y_true)] # compare each row
         return sum(scorelist)/float(len(scorelist)) # compute percent correct
 
-
-    # def calculate_accuracy_predict_old(self, test_tracks, test_labels):
-    #     test_data = np.array(test_tracks) * self.weights
-    #     predict = self.knc.predict(test_tracks)
-    #     nCorrect = 0
-    #     nWrong = 0
-    #     for idx, val in enumerate(predict):
-    #         if val == test_labels[idx]:
-    #             nCorrect +=1
-    #         else:
-    #             nWrong += 1
-    #     print "correct = ", nCorrect
-    #     print "wrong = ", nWrong
-    #     return nCorrect*1.0/(nCorrect+nWrong)
 
     def calculate_accuracy_predict(self, data, labels):
         data = np.array(data) * self.weights
