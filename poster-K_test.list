@@ -11,10 +11,10 @@
 
 # Different K values, and n = k for relaxed
 # using whiten, logistic, combo plus, r=l1, 100.0
---knn -k 5 --knn_relax_n 5 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
---knn -k 6 --knn_relax_n 6 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
---knn -k 7 --knn_relax_n 7 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
---knn -k 8 --knn_relax_n 8 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
---knn -k 9 --knn_relax_n 9 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
---knn -k 12 --knn_relax_n 12 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 5 --knn_relax_n 5 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 6 --knn_relax_n 6 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 7 --knn_relax_n 7 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 8 --knn_relax_n 8 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 9 --knn_relax_n 9 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
+# --knn -k 12 --knn_relax_n 12 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
 --knn -k 15 --knn_relax_n 15 -c 50 -p whiten --logistic -r l1 --rstrength 100.0 -f comboPlus
