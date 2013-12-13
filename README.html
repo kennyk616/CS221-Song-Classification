@@ -275,11 +275,17 @@ MathJax.Hub.Config({
   showProcessingMessages: false
 });
 </script>
-<title>README</title></head><body><h1 id="cs221-project-cover-song-classification">CS221 Project: Cover Song Classification</h1>
+<title>README</title></head><body><h1 id="cs221-cover-song-classification">CS221: Cover Song Classification</h1>
 <p>Ian Tenney (<code>iftenney</code>)<br />
 Ken Kao (<code>kennykao</code>)<br />
+Course project for CS221: Artificial Intelligence: Principles and Techniques<br />
 December 12, 2013  </p>
-<h2 id="quick-start-guide">Quick-Start Guide</h2>
+<h2 id="getting-started">Getting Started</h2>
+<p><strong>Note:</strong> This guide assumes that you are logged in to <code>corn</code>, or on a similarly-configured computer running a recent version of Linux with an up-to-date Python distribution.</p>
+<p>First, make a link to the dataset, which is hosted on AFS<em>:<br />
+<code>ln -s /afs/ir.stanford.edu/users/i/f/iftenney/public/MSD-SHS MSD-SHS</code><br />
+</em><em>Thanks CS221 for giving us extra AFS space!</em></p>
+<p>Alternatively, a <em>very</em> small number of sample tracks are available in the <code>MSD-SHS_r</code> directory; rename this to <code>MSD-SHS</code> to run with the restricted set (this will likely crash, as some algorithms require a certain amount of data to avoid empty-set errors).</p>
 <p>You can run the project by typing:
 <code>python main.py</code></p>
 <p>This will run with default settings, which are:</p>
@@ -290,6 +296,7 @@ December 12, 2013  </p>
 </ul>
 <p>The project requires a number of libraries to run. They are:</p>
 <ul>
+<li><strong>Python</strong> (tested with 2.7.4 and 2.7.6)</li>
 <li><strong>NumPy</strong>, <strong>SciPy</strong>, and <strong>matplotlib</strong> (particularly, the <em>Pylab</em> namespace)</li>
 <li><strong>PyTables</strong> (for reading HDF5 data files)</li>
 <li><strong>scikit-learn</strong> (for core algorithms)</li>
@@ -297,7 +304,7 @@ December 12, 2013  </p>
 <p>Additionally, to run metric learning (<code>--LMNN</code>):</p>
 <ul>
 <li>Kilian Q Weinberger's LMNN library, included in <code>./lib/</code></li>
-<li><strong>MATLAB</strong></li>
+<li><strong>MATLAB</strong> (tested with R2013b)</li>
 <li>an installed C/C++ compiler, to run <code>install.m</code> in <code>./lib/mLMNN2.4/</code></li>
 </ul>
 <h2 id="running-the-project">Running the Project</h2>

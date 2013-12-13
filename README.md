@@ -1,11 +1,21 @@
-CS221 Project: Cover Song Classification
-========================================
+CS221: Cover Song Classification
+================================
+
 Ian Tenney (`iftenney`)  
 Ken Kao (`kennykao`)  
+Course project for CS221: Artificial Intelligence: Principles and Techniques  
 December 12, 2013  
 
-Quick-Start Guide
------------------
+Getting Started
+---------------
+
+**Note:** This guide assumes that you are logged in to `corn`, or on a similarly-configured computer running a recent version of Linux with an up-to-date Python distribution.
+
+First, make a link to the dataset, which is hosted on AFS*:  
+`ln -s /afs/ir.stanford.edu/users/i/f/iftenney/public/MSD-SHS MSD-SHS`  
+**Thanks CS221 for giving us extra AFS space!*
+
+Alternatively, a *very* small number of sample tracks are available in the `MSD-SHS_r` directory; rename this to `MSD-SHS` to run with the restricted set (this will likely crash, as some algorithms require a certain amount of data to avoid empty-set errors).
 
 You can run the project by typing:
 `python main.py`
@@ -18,6 +28,7 @@ This will run with default settings, which are:
 
 The project requires a number of libraries to run. They are:
 
+- **Python** (tested with 2.7.4 and 2.7.6)
 - **NumPy**, **SciPy**, and **matplotlib** (particularly, the *Pylab* namespace)
 - **PyTables** (for reading HDF5 data files)
 - **scikit-learn** (for core algorithms)
@@ -25,7 +36,7 @@ The project requires a number of libraries to run. They are:
 Additionally, to run metric learning (`--LMNN`):
 
 - Kilian Q Weinberger's LMNN library, included in `./lib/`
-- **MATLAB**
+- **MATLAB** (tested with R2013b)
 - an installed C/C++ compiler, to run `install.m` in `./lib/mLMNN2.4/`
 
 
