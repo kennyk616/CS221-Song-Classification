@@ -1,0 +1,15 @@
+# Varying number of cliques
+# combo vs combo plus vs combo plus r100 vs combo plus r100, whiten
+# all with k=7, n=5, skipping logistic test
+
+# combo, r100.0, scale
+# -c 25 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 35 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 50 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 75 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 100 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 200 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+# -c 300 -p scale -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5
+
+# combo, r100.0, whiten
+-c 50 -p whiten -f combo --logistic --noTestLogistic -r l1 --rstrength 100.0 --knn -k 7 --knn_relax_n 5

@@ -4,12 +4,12 @@ Test set:  50 cliques found in 262 tracks.
 -- using combo features --
 Data preprocessor: <class 'transform.StandardScaler'>
 Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0256 seconds.
+Preprocessing data...  completed in 0.0277 seconds.
 Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 2 minutes.
+LMNN optimization completed in 1.8 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
   243 dimensions
@@ -27,12 +27,12 @@ Test set:  50 cliques found in 262 tracks.
 -- using combo features --
 Data preprocessor: <class 'transform.StandardScaler'>
 Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0257 seconds.
+Preprocessing data...  completed in 0.0283 seconds.
 Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 1.1 minutes.
+LMNN optimization completed in 1.3 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
   243 dimensions
@@ -50,12 +50,12 @@ Test set:  50 cliques found in 262 tracks.
 -- using combo features --
 Data preprocessor: <class 'transform.StandardScaler'>
 Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0293 seconds.
+Preprocessing data...  completed in 0.0261 seconds.
 Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 0.9 minutes.
+LMNN optimization completed in 0.87 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
   243 dimensions
@@ -73,12 +73,12 @@ Test set:  50 cliques found in 262 tracks.
 -- using combo features --
 Data preprocessor: <class 'transform.StandardScaler'>
 Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0266 seconds.
+Preprocessing data...  completed in 0.0265 seconds.
 Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 2 minutes.
+LMNN optimization completed in 1.8 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
   243 dimensions
@@ -96,12 +96,12 @@ Test set:  50 cliques found in 262 tracks.
 -- using combo features --
 Data preprocessor: <class 'transform.StandardScaler'>
 Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0259 seconds.
+Preprocessing data...  completed in 0.0287 seconds.
 Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 1.1 minutes.
+LMNN optimization completed in 0.99 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
   243 dimensions

@@ -1,115 +1,115 @@
->> python main.py --seed_xval 1 --seed_pairs 1 --LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
+>> python main.py --seed_xval 1 --seed_pairs 1 --LMNN -c 50 -p scale -f comboPlus --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
 Training set:  50 cliques found in 624 tracks.
 Test set:  50 cliques found in 262 tracks.
--- using combo features --
+-- using comboPlus features --
 Data preprocessor: <class 'transform.StandardScaler'>
-Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0258 seconds.
-Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
+Loading training set...  completed in 15 seconds.
+Preprocessing data...  completed in 0.0306 seconds.
+Creating temp file 'temp/LMNN-data.temp.mat'  : 1.4 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 1.6 minutes.
+LMNN optimization completed in 1.2 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
-  243 dimensions
-  16524 nonzero elements
+  287 dimensions
+  19516 nonzero elements
 KNN: using 'mahalanobis' metric with params ['VI']
 Running KNN with k=7 and mahalanobis metric
-==> KNN training accuracy: 21.47%
-==> KNN test accuracy: 3.05%
+==> KNN training accuracy: 22.12%
+==> KNN test accuracy: 2.29%
 Checking KNN, relaxed to top 5 membership
-==> KNN relax training accuracy: 79.49%
-==> KNN relax test accuracy: 11.83%
->> python main.py --seed_xval 2 --seed_pairs 2 --LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
+==> KNN relax training accuracy: 81.89%
+==> KNN relax test accuracy: 14.12%
+>> python main.py --seed_xval 2 --seed_pairs 2 --LMNN -c 50 -p scale -f comboPlus --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
 Training set:  50 cliques found in 624 tracks.
 Test set:  50 cliques found in 262 tracks.
--- using combo features --
+-- using comboPlus features --
 Data preprocessor: <class 'transform.StandardScaler'>
-Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0265 seconds.
-Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
+Loading training set...  completed in 16 seconds.
+Preprocessing data...  completed in 0.0297 seconds.
+Creating temp file 'temp/LMNN-data.temp.mat'  : 1.4 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
 LMNN optimization completed in 1.5 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
-  243 dimensions
-  16038 nonzero elements
+  287 dimensions
+  16072 nonzero elements
 KNN: using 'mahalanobis' metric with params ['VI']
 Running KNN with k=7 and mahalanobis metric
-==> KNN training accuracy: 18.11%
+==> KNN training accuracy: 17.47%
 ==> KNN test accuracy: 2.67%
 Checking KNN, relaxed to top 5 membership
-==> KNN relax training accuracy: 81.41%
-==> KNN relax test accuracy: 15.65%
->> python main.py --seed_xval 3 --seed_pairs 3 --LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
+==> KNN relax training accuracy: 84.46%
+==> KNN relax test accuracy: 14.12%
+>> python main.py --seed_xval 3 --seed_pairs 3 --LMNN -c 50 -p scale -f comboPlus --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
 Training set:  50 cliques found in 624 tracks.
 Test set:  50 cliques found in 262 tracks.
--- using combo features --
+-- using comboPlus features --
 Data preprocessor: <class 'transform.StandardScaler'>
-Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0252 seconds.
-Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
+Loading training set...  completed in 15 seconds.
+Preprocessing data...  completed in 0.0307 seconds.
+Creating temp file 'temp/LMNN-data.temp.mat'  : 1.4 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 1.5 minutes.
+LMNN optimization completed in 1.1 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
-  243 dimensions
-  16281 nonzero elements
-KNN: using 'mahalanobis' metric with params ['VI']
-Running KNN with k=7 and mahalanobis metric
-==> KNN training accuracy: 12.66%
-==> KNN test accuracy: 1.53%
-Checking KNN, relaxed to top 5 membership
-==> KNN relax training accuracy: 81.25%
-==> KNN relax test accuracy: 11.83%
->> python main.py --seed_xval 4 --seed_pairs 4 --LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
-Training set:  50 cliques found in 624 tracks.
-Test set:  50 cliques found in 262 tracks.
--- using combo features --
-Data preprocessor: <class 'transform.StandardScaler'>
-Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0254 seconds.
-Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
-Invoking MATLAB with command:
->> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
- logging results to temp/LMNN.log
-LMNN optimization completed in 1.6 minutes.
- results logged to temp/LMNN.log
-Mahalanobis matrix: 
-  243 dimensions
-  15309 nonzero elements
+  287 dimensions
+  19516 nonzero elements
 KNN: using 'mahalanobis' metric with params ['VI']
 Running KNN with k=7 and mahalanobis metric
 ==> KNN training accuracy: 16.19%
-==> KNN test accuracy: 0.76%
+==> KNN test accuracy: 1.53%
 Checking KNN, relaxed to top 5 membership
-==> KNN relax training accuracy: 79.97%
-==> KNN relax test accuracy: 15.27%
->> python main.py --seed_xval 5 --seed_pairs 5 --LMNN -c 50 -p scale -f combo --knn -k 7 --knn_relax_n 5 --lmnnMu 0.5
+==> KNN relax training accuracy: 79.65%
+==> KNN relax test accuracy: 11.07%
+>> python main.py --seed_xval 4 --seed_pairs 4 --LMNN -c 50 -p scale -f comboPlus --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
 Training set:  50 cliques found in 624 tracks.
 Test set:  50 cliques found in 262 tracks.
--- using combo features --
+-- using comboPlus features --
 Data preprocessor: <class 'transform.StandardScaler'>
-Loading training set...  completed in 13 seconds.
-Preprocessing data...  completed in 0.0274 seconds.
-Creating temp file 'temp/LMNN-data.temp.mat'  : 1.2 MB
+Loading training set...  completed in 16 seconds.
+Preprocessing data...  completed in 0.0304 seconds.
+Creating temp file 'temp/LMNN-data.temp.mat'  : 1.4 MB
 Invoking MATLAB with command:
 >> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
  logging results to temp/LMNN.log
-LMNN optimization completed in 0.85 minutes.
+LMNN optimization completed in 1.1 minutes.
  results logged to temp/LMNN.log
 Mahalanobis matrix: 
-  243 dimensions
-  17253 nonzero elements
+  287 dimensions
+  18942 nonzero elements
 KNN: using 'mahalanobis' metric with params ['VI']
 Running KNN with k=7 and mahalanobis metric
-==> KNN training accuracy: 20.51%
-==> KNN test accuracy: 1.53%
+==> KNN training accuracy: 15.54%
+==> KNN test accuracy: 2.29%
 Checking KNN, relaxed to top 5 membership
-==> KNN relax training accuracy: 75.00%
-==> KNN relax test accuracy: 8.78%
+==> KNN relax training accuracy: 79.65%
+==> KNN relax test accuracy: 17.56%
+>> python main.py --seed_xval 5 --seed_pairs 5 --LMNN -c 50 -p scale -f comboPlus --knn -k 7 --knn_relax_n 5 --lmnnMu 0.9
+Training set:  50 cliques found in 624 tracks.
+Test set:  50 cliques found in 262 tracks.
+-- using comboPlus features --
+Data preprocessor: <class 'transform.StandardScaler'>
+Loading training set...  completed in 16 seconds.
+Preprocessing data...  completed in 0.0328 seconds.
+Creating temp file 'temp/LMNN-data.temp.mat'  : 1.4 MB
+Invoking MATLAB with command:
+>> matlab -nodisplay -nojvm -r "cd 'lib/mLMNN2.4/'; run('setpaths.m'); cd '../../'; load('temp/LMNN-data.temp.mat'); [L,Det] = lmnn2(X',y', 'diagonal', params.diagonal, 'mu', params.mu, 'obj', 0); save('temp/LMNN-res.temp.mat', 'L', 'Det', '-v6'); quit;"
+ logging results to temp/LMNN.log
+LMNN optimization completed in 1.1 minutes.
+ results logged to temp/LMNN.log
+Mahalanobis matrix: 
+  287 dimensions
+  18942 nonzero elements
+KNN: using 'mahalanobis' metric with params ['VI']
+Running KNN with k=7 and mahalanobis metric
+==> KNN training accuracy: 20.03%
+==> KNN test accuracy: 1.91%
+Checking KNN, relaxed to top 5 membership
+==> KNN relax training accuracy: 79.81%
+==> KNN relax test accuracy: 14.12%
