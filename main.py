@@ -220,10 +220,10 @@ if __name__ == '__main__':
     #
     #parser.add_argument('-t', '--ntrain', dest='ntrain', type=int, default=5000)
     #parser.add_argument('-e', '--ntest', dest='ntest', type=int, default=1000)
-    parser.add_argument('-c', '--nclique', dest='nclique', type=int, default=300)
+    parser.add_argument('-c', '--nclique', dest='nclique', type=int, default=50)
     parser.add_argument("--test_fraction", dest='test_fraction', type=float, default=0.33)
     parser.add_argument('-f', '--features', dest='features', 
-                        default='combo',
+                        default='comboPlus',
                         choices=['timbre', 'combo', 'combo2', 'comboPlus'])
 
     ##
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     ##
     # Preprocessing mode and parameters
     parser.add_argument('-p', '--pre', dest='preprocess', 
-                        default='none',
+                        default='scale',
                         choices=['none', 'scale', 'whiten', 'both', 'pca'])
     parser.add_argument('--pca', dest='npca', type=float,
                         default=100)
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     # Options for logistic classifier
     parser.add_argument('--logistic', dest='do_logistic', action='store_true')
     parser.add_argument('-r', '--reg', dest='reg', metavar='regularization', 
-                        default='l2',
+                        default='l1',
                         choices=['l1','l2'])
     # Regularization strength: higher is stronger
     parser.add_argument('--rstrength', dest='rstrength', default=1.0, type=float)
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     ##
     # Options for KNN classifier
     parser.add_argument('--knn', dest='do_knn', action='store_true')
-    parser.add_argument('-k', dest='k', default=5, type=int)
+    parser.add_argument('-k', dest='k', default=7, type=int)
     parser.add_argument('--knnMetric', dest='knnMetric', 
                         default='euclidean') # overridden by LMNN
     parser.add_argument('--knnDWeight', dest='knnDWeight',
